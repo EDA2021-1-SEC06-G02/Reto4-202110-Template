@@ -1,5 +1,8 @@
 #ISIS1225 - Librerias de soporte
 
+Req. 2,  Javier Cerino - 202020873, j.cerino@uniandes.edu.co
+Req. 3,  Marco Zuliani - 202022412, m.zuliani@uniandes.edu.co
+
 Este proyecto contiene los Tipos abstractos de datos, estructuras de datos y algoritmos requeridos por el curso ISIS1225-Estructuras de Datos y Algoritmos
 
 -Lib

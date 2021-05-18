@@ -36,8 +36,16 @@ operación solicitada
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("1- Inicializar catálogo")
+    print("2- Cargar información en el catálogo")
+    print("3- Encontrar la cantidad de clústeres")
+    print("4- Encontrar landing point(s) que sirven como punto de interconexión")
+    print("5- Encontrar la ruta mínima en distancia para enviar información entre dos países")
+    print("6- Identifique la red de expansión mínima en cuanto a distancia con mayor cobertura")
+    print("7- Lista de países que podrían verse afectados al producirse una caída en el proceso de comunicación")
+    print("8- Conocer el ancho de banda máximo que se puede garantizar para la transmisión")
+    print("9- Encontrar la ruta mínima en número de saltos para enviar información")
+    print("10- Graficar mapa resultados requerimientos")
 
 catalog = None
 
@@ -51,6 +59,30 @@ while True:
         print("Cargando información de los archivos ....")
 
     elif int(inputs[0]) == 2:
+        pass
+
+    elif int(inputs[0]) == 3:
+        pass
+
+    elif int(inputs[0]) == 4:
+        pass
+
+    elif int(inputs[0]) == 5:
+        pass
+
+    elif int(inputs[0]) == 6:
+        pass
+
+    elif int(inputs[0]) == 7:
+        pass
+
+    elif int(inputs[0]) == 8:
+        pass
+
+    elif int(inputs[0]) == 9:
+        pass
+
+    elif int(inputs[0]) == 10:
         pass
 
     else:
