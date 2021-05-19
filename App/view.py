@@ -24,6 +24,7 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+import time
 assert cf
 
 
@@ -57,9 +58,23 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
+        t1 = time.process_time()
+        catalog = controller.newAnalyzer()
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
 
     elif int(inputs[0]) == 2:
-        pass
+        t1 = time.process_time()
+        controller.loadData(catalog)
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        TotCountries,TotLanging,TotConexiones = controller.InfoCatalog(catalog)
+        print("Se cargaron:",TotLanging,"landing points.")
+        print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
+        print("Se cargaron:",TotCountries,"paises.")
+        print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+
 
     elif int(inputs[0]) == 3:
         pass

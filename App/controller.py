@@ -29,10 +29,28 @@ import csv
 El controlador se encarga de mediar entre la vista y el modelo.
 """
 
-# Inicialización del Catálogo de libros
+# Inicialización del Catálogo del analizador
+
+def newAnalyzer():
+    return model.newAnalyzer()
 
 # Funciones para la carga de datos
+
+def loadData(Analizer):
+    File = "connections.csv"
+    File2= "countries.csv"
+    File3= "landing_points.csv"
+    File = cf.data_dir + File
+    File2 = cf.data_dir + File2
+    File3 = cf.data_dir + File3
+    input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
+    for Entry in input_file:
+        model.AddCountry(Analizer, Entry)  
+    return Analizer
 
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def InfoCatalog(analyzer):
+    return model.InfoCatalog(analyzer)
