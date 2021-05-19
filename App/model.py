@@ -34,6 +34,8 @@ from DISClib.ADT.graph import gr
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+from DISClib.Algorithms.Sorting import mergesort as Merge
+import haversine as hs
 assert cf
 
 """
@@ -45,15 +47,15 @@ los mismos.
 
 def newAnalyzer():
     try:
-        analyzer = {'LandingPoint': None,'connections': None,'countrysInfo':None}
+        analyzer = {'LandingPoint': None,'connectionsDistance': None,'connectionsCapacity': None,'countrysInfo':None}
 
         analyzer['LandingPoint'] = mp.newMap(numelements=1290,maptype='PROBING',comparefunction=compareCountryNames)
 
-        analyzer['connections'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
-        #Cargar Vertices con ID-Cable
+        analyzer['connectionsDistance'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
+
+        analyzer['connectionsCapacity'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
 
         analyzer['countriesInfo'] = mp.newMap(numelements=240, maptype='PROBING', comparefunction=compareCountryNames)
-        #Cargar con Nombre Pais
 
         return analyzer
     except Exception as exp:
@@ -75,10 +77,14 @@ def addLandingConnection(analyzer, Entry):
     try:
         origin = formatVertexOring(Entry)
         destination = formatVertexDestination(Entry)
-        #distance = CalculateDistance(Entry)
-        addLandingVertex(analyzer, origin)
-        addLandingVertex(analyzer, destination)
-        #addConnection(analyzer, origin, destination, distance)
+        distance = CalculateDistance(analyzer,Entry)
+        addLandingVertexDistance(analyzer, origin)
+        addLandingVertexDistance(analyzer, destination)
+        addLandingVertexCapacity(analyzer, destination)
+        addLandingVertexCapacity(analyzer, destination)
+        addConnectionDistance(analyzer, origin, destination, distance)
+        capacity = Entry['capacityTBPS']
+        addConnectionCapacity(analyzer, origin, destination,capacity)
         addLandingsRoutes(analyzer, Entry)
         return analyzer
     except Exception as exp:
@@ -96,13 +102,18 @@ def AddCountry(Analyzer,country):
     lt.addLast(NameCountry['countriesInfo'], country)
     return Analyzer
 
-def addLandingVertex(analyzer, LandingId):
-    """
-    Adiciona una estación como un vertice del grafo
-    """
+def addLandingVertexDistance(analyzer, LandingId):
     try:
-        if not gr.containsVertex(analyzer['connections'], LandingId):
-            gr.insertVertex(analyzer['connections'], LandingId)
+        if not gr.containsVertex(analyzer['connectionsDistance'], LandingId):
+            gr.insertVertex(analyzer['connectionsDistance'], LandingId)
+        return analyzer
+    except Exception as exp:
+        error.reraise(exp, 'model:addLandingVertex')
+
+def addLandingVertexCapacity(analyzer, LandingId):
+    try:
+        if not gr.containsVertex(analyzer['connectionsCapacity'], LandingId):
+            gr.insertVertex(analyzer['connectionsCapacity'], LandingId)
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:addLandingVertex')
@@ -112,28 +123,52 @@ def addLandingsRoutes(analyzer, Entry):
     try:
         entry = me.getValue(entry)
         CableName = Entry['cable_name']
+        CapacityValue = Entry['capacityTBPS']
         if not lt.isPresent(entry['lstCables'], CableName):
             lt.addLast(entry['lstCables'], CableName)
+        if not lt.isPresent(entry['lstCapacity'], CapacityValue):
+            lt.addLast(entry['lstCapacity'], CapacityValue)
         mp.put(analyzer['LandingPoint'], Entry['origin'], entry)
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:InexistenciaLanding')
 
-def addConnection(analyzer, origin, destination, distance):
-    """
-    Adiciona un arco entre dos estaciones
-    """
-    edge = gr.getEdge(analyzer['connections'], origin, destination)
+def addRouteConnections(analyzer):
+    lststops = mp.keySet(analyzer['LandingPoint'])
+    for key in lt.iterator(lststops):
+        lstCables = mp.get(analyzer['LandingPoint'], key)
+        lstCables = me.getValue(lstCables)['lstCables']
+        lstCables = CapacityOrder(lstCables)
+        prevCableName = None
+        for CableName in lt.iterator(lstCables):
+            CableName = key + '-' + CableName
+            capacity = lt.getElement(lstCables,1)
+            if prevCableName is not None:
+                addConnectionDistance(analyzer, prevCableName, CableName, 100)
+                addConnectionCapacity(analyzer, prevCableName, CableName, capacity)
+            prevCableName = CableName
+
+def addConnectionDistance(analyzer, origin, destination, distance):
+    edge = gr.getEdge(analyzer['connectionsDistance'], origin, destination)
     if edge is None:
-        gr.addEdge(analyzer['connections'], origin, destination, distance)
+        gr.addEdge(analyzer['connectionsDistance'], origin, destination, distance)
     return analyzer
 
+def addConnectionCapacity(analyzer, origin, destination, Capacity):
+    try:
+        edge = gr.getEdge(analyzer['connectionsCapacity'], origin, destination)
+        if edge is None:
+            gr.addEdge(analyzer['connectionsCapacity'], origin, destination, Capacity)
+        return analyzer
+    except:
+        pass
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
-    entry = {'lstData':None,'lstCables':None}
+    entry = {'lstData':None,'lstCables':None,'lstCapacity':None}
     entry['lstData'] = lt.newList('ARRAY_LIST')
     entry['lstCables'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
+    entry['lstCapacity'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
     return entry
 
 def newCountryValues():
@@ -155,14 +190,34 @@ def formatVertexDestination(Entry):
 
 def InfoCatalog(analyzer):
     sizeCountries = lt.size(mp.keySet(analyzer['countriesInfo']))
-    totLandingPoints= lt.size(mp.keySet(analyzer['LandingPoint']))
-    totConections=0
+    totLandingPoints = lt.size(mp.keySet(analyzer['LandingPoint']))
+    totConections = gr.numEdges(analyzer['connectionsDistance'])
     return sizeCountries,totLandingPoints,totConections
 
-def CalculateDistance(Entry):
+def CalculateDistance(analyzer,Entry):
     oring = Entry['origin']
     destination = Entry['destination']
-    pass
+    Info1 = mp.get(analyzer['LandingPoint'],oring)
+    Info2 = mp.get(analyzer['LandingPoint'],destination)
+    try:
+        latitude1 = me.getValue(Info1)['lstData']
+        latitude1 = float(lt.getElement(latitude1,1)['latitude'])
+        latitude2 = me.getValue(Info2)['lstData']
+        latitude2 = float(lt.getElement(latitude2,1)['latitude'])
+    except:
+        pass
+    try:
+        longitude1 = me.getValue(Info1)['lstData']
+        longitude1 = float(lt.getElement(longitude1,1)['longitude'])
+        longitude2 = me.getValue(Info2)['lstData']
+        longitude2 = float(lt.getElement(longitude2,1)['longitude'])
+    except:
+        pass
+    loc1=latitude1,longitude1
+    loc2=latitude2,longitude2
+    distance = hs.haversine(loc1,loc2)
+    distance *= 1000
+    return distance
 
 #Funciones Comparacion
 
@@ -199,3 +254,12 @@ def compareCableName(Cable1, Cable2):
         return 1
     else:
         return -1
+
+def CapacityOrder(listaOrdenada):
+    sub_list = lt.subList(listaOrdenada, 1, lt.size(listaOrdenada))
+    sub_list = sub_list.copy()
+    sorted_list = Merge.sort(sub_list, cmpCapacitys)
+    return sorted_list
+
+def cmpCapacitys(video1, video2):
+    return video1 < video2
