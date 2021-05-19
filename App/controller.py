@@ -36,17 +36,24 @@ def newAnalyzer():
 
 # Funciones para la carga de datos
 
-def loadData(Analizer):
+def loadData(analyzer):
     File = "connections.csv"
     File2= "countries.csv"
     File3= "landing_points.csv"
     File = cf.data_dir + File
     File2 = cf.data_dir + File2
     File3 = cf.data_dir + File3
+    input_file = csv.DictReader(open(File3, encoding="utf-8"), delimiter=",")
+    for Entry in input_file:
+        model.AddLandingPointsData(analyzer, Entry) 
     input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
     for Entry in input_file:
-        model.AddCountry(Analizer, Entry)  
-    return Analizer
+        model.AddCountry(analyzer, Entry)
+    input_file = csv.DictReader(open(File, encoding="utf-8"), delimiter=",")
+    for Entry in input_file:
+        model.addLandingConnection(analyzer, Entry)
+    model.addRouteConnections(analyzer)
+    return analyzer
 
 # Funciones de ordenamiento
 
