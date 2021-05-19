@@ -66,14 +66,17 @@ while True:
 
     elif int(inputs[0]) == 2:
         t1 = time.process_time()
-        controller.loadData(catalog)
+        catalog,InfoPrimerLanding,InfoUltimoPais = controller.loadData(catalog)
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
         TotCountries,TotLanging,TotConexiones = controller.InfoCatalog(catalog)
         print("Se cargaron:",TotLanging,"landing points.")
         print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
         print("Se cargaron:",TotCountries,"paises.")
+        print(InfoPrimerLanding)
+        print(InfoUltimoPais)
         print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+        input("Enter para continuar")
 
 
     elif int(inputs[0]) == 3:

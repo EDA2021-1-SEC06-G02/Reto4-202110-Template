@@ -75,10 +75,10 @@ def addLandingConnection(analyzer, Entry):
     try:
         origin = formatVertexOring(Entry)
         destination = formatVertexDestination(Entry)
-        distance = CalculateDistance(Entry)
+        #distance = CalculateDistance(Entry)
         addLandingVertex(analyzer, origin)
         addLandingVertex(analyzer, destination)
-        addConnection(analyzer, origin, destination, distance)
+        #addConnection(analyzer, origin, destination, distance)
         addLandingsRoutes(analyzer, Entry)
         return analyzer
     except Exception as exp:
@@ -119,7 +119,6 @@ def addLandingsRoutes(analyzer, Entry):
     except Exception as exp:
         error.reraise(exp, 'model:InexistenciaLanding')
 
-
 def addConnection(analyzer, origin, destination, distance):
     """
     Adiciona un arco entre dos estaciones
@@ -133,8 +132,8 @@ def addConnection(analyzer, origin, destination, distance):
 
 def CreateLandingInfo():
     entry = {'lstData':None,'lstCables':None}
-    entry['lstData'] = lt.newList()
-    entry['lstCables'] = lt.newList(cmpfunction=compareCableName)
+    entry['lstData'] = lt.newList('ARRAY_LIST')
+    entry['lstCables'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
     return entry
 
 def newCountryValues():

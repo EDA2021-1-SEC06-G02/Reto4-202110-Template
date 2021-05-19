@@ -44,16 +44,23 @@ def loadData(analyzer):
     File2 = cf.data_dir + File2
     File3 = cf.data_dir + File3
     input_file = csv.DictReader(open(File3, encoding="utf-8"), delimiter=",")
+    contador=1
     for Entry in input_file:
-        model.AddLandingPointsData(analyzer, Entry) 
+        model.AddLandingPointsData(analyzer, Entry)
+        if contador==1:
+            InfoPrimero=Entry
+        contador+=1
     input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
     for Entry in input_file:
         model.AddCountry(analyzer, Entry)
-    input_file = csv.DictReader(open(File, encoding="utf-8"), delimiter=",")
+        InfoUltimo=Entry
+    input_file = csv.DictReader(open(File, encoding="utf-8-sig"), delimiter=",")
     for Entry in input_file:
         model.addLandingConnection(analyzer, Entry)
-    model.addRouteConnections(analyzer)
-    return analyzer
+    #model.addRouteConnections(analyzer)
+    InfoPrimerLanding="Identificador: "+InfoPrimero['landing_point_id']+". Nombre: "+InfoPrimero['name']+". Latitud: "+InfoPrimero['latitude']+". Longitud: "+InfoPrimero['longitude']
+    InfoUltimoPais="Pais: "+InfoUltimo['CountryName']+". Población: "+InfoUltimo['Population']+". Usuarios Internet: "+InfoUltimo['Internet users']
+    return analyzer,InfoPrimerLanding,InfoUltimoPais
 
 # Funciones de ordenamiento
 
