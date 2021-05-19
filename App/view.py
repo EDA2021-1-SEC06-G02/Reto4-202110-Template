@@ -71,12 +71,14 @@ while True:
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
         TotCountries,TotLanging,TotConexiones = controller.InfoCatalog(catalog)
+        print("---------------------------------------------------------------------------------------------------------------------------------------------------------")
         print("Se cargaron:",TotLanging,"landing points.")
         print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
         print("Se cargaron:",TotCountries,"paises.")
         print(InfoPrimerLanding)
         print(InfoUltimoPais)
         print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+        print("---------------------------------------------------------------------------------------------------------------------------------------------------------")
         input("Enter para continuar")
 
 

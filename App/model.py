@@ -77,11 +77,14 @@ def addLandingConnection(analyzer, Entry):
     try:
         origin = formatVertexOring(Entry)
         destination = formatVertexDestination(Entry)
+        capitalInfo = formatVertexCapital(analyzer,Entry)
         distance = CalculateDistance(analyzer,Entry)
         addLandingVertexDistance(analyzer, origin)
         addLandingVertexDistance(analyzer, destination)
+        addLandingVertexDistance(analyzer, capitalInfo)
+        addLandingVertexCapacity(analyzer, origin)
         addLandingVertexCapacity(analyzer, destination)
-        addLandingVertexCapacity(analyzer, destination)
+        addLandingVertexCapacity(analyzer, capitalInfo)
         addConnectionDistance(analyzer, origin, destination, distance)
         capacity = Entry['capacityTBPS']
         addConnectionCapacity(analyzer, origin, destination,capacity)
@@ -98,8 +101,15 @@ def AddCountry(Analyzer,country):
         NameCountry = me.getValue(entry)
     else:
         NameCountry = newCountryValues()
-        mp.put(Analyzer['countriesInfo'], Name, NameCountry)
+    mp.put(Analyzer['countriesInfo'], Name, NameCountry)
     lt.addLast(NameCountry['countriesInfo'], country)
+    entry = mp.get(Analyzer['LandingPoint'], Name)
+    if entry is None:
+        CaracEntry = CreateLandingInfo()
+    else:
+        CaracEntry = me.getValue(entry)
+    lt.addLast(CaracEntry['lstData'], country)
+    mp.put(Analyzer['LandingPoint'],Name,CaracEntry)
     return Analyzer
 
 def addLandingVertexDistance(analyzer, LandingId):
@@ -124,10 +134,9 @@ def addLandingsRoutes(analyzer, Entry):
         entry = me.getValue(entry)
         CableName = Entry['cable_name']
         CapacityValue = Entry['capacityTBPS']
-        if not lt.isPresent(entry['lstCables'], CableName):
-            lt.addLast(entry['lstCables'], CableName)
-        if not lt.isPresent(entry['lstCapacity'], CapacityValue):
-            lt.addLast(entry['lstCapacity'], CapacityValue)
+        Value = (CableName,CapacityValue)
+        if not lt.isPresent(entry['lstCables'], Value):
+            lt.addLast(entry['lstCables'], Value)
         mp.put(analyzer['LandingPoint'], Entry['origin'], entry)
         return analyzer
     except Exception as exp:
@@ -139,13 +148,17 @@ def addRouteConnections(analyzer):
         lstCables = mp.get(analyzer['LandingPoint'], key)
         lstCables = me.getValue(lstCables)['lstCables']
         lstCables = CapacityOrder(lstCables)
+        capitalInfo = ObtenerPais(analyzer,key)
+        CapitalDistance = CalculateDistanceCapital(analyzer,key,capitalInfo)
         prevCableName = None
         for CableName in lt.iterator(lstCables):
-            CableName = key + '-' + CableName
-            capacity = lt.getElement(lstCables,1)
+            CableName = key + '-' + CableName[0]
+            capacity = lt.getElement(lstCables,1)[1]
             if prevCableName is not None:
                 addConnectionDistance(analyzer, prevCableName, CableName, 100)
                 addConnectionCapacity(analyzer, prevCableName, CableName, capacity)
+                addConnectionDistance(analyzer, prevCableName, capitalInfo, CapitalDistance)
+                addConnectionCapacity(analyzer, prevCableName, capitalInfo, capacity)
             prevCableName = CableName
 
 def addConnectionDistance(analyzer, origin, destination, distance):
@@ -165,10 +178,9 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
-    entry = {'lstData':None,'lstCables':None,'lstCapacity':None}
+    entry = {'lstData':None,'lstCables':None}
     entry['lstData'] = lt.newList('ARRAY_LIST')
     entry['lstCables'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
-    entry['lstCapacity'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
     return entry
 
 def newCountryValues():
@@ -185,6 +197,22 @@ def formatVertexDestination(Entry):
     name = Entry['destination'] + '-'
     name = name + Entry['cable_name']
     return name
+
+def formatVertexCapital(analyzer,Entry):
+    LPorigen = Entry['origin']
+    value = mp.get(analyzer['LandingPoint'],LPorigen)
+    value = lt.getElement(me.getValue(value)['lstData'],1)['name']
+    nameCountry = value.split(',')
+    nameCountry = nameCountry[len(nameCountry)-1].strip()
+    return nameCountry
+
+def ObtenerPais(analyzer,key):
+    if not mp.contains(analyzer['countriesInfo'],key):
+        value = mp.get(analyzer['LandingPoint'],key)
+        value = lt.getElement(me.getValue(value)['lstData'],1)['name']
+        nameCountry = value.split(',')
+        nameCountry = nameCountry[len(nameCountry)-1].strip()
+        return nameCountry
 
 # Funciones de consulta
 
@@ -218,6 +246,26 @@ def CalculateDistance(analyzer,Entry):
     distance = hs.haversine(loc1,loc2)
     distance *= 1000
     return distance
+
+def CalculateDistanceCapital(analyzer, oring, destination):
+    try:
+        Info1 = mp.get(analyzer['LandingPoint'],oring)
+        InfoCapital = mp.get(analyzer['LandingPoint'],destination)
+        latitude1 = me.getValue(Info1)['lstData']
+        latitude1 = float(lt.getElement(latitude1,1)['latitude'])
+        latitudeCapital = me.getValue(InfoCapital)['lstData']
+        latitudeCapital = float(lt.getElement(latitudeCapital,1)['CapitalLatitude'])
+        longitude1 = me.getValue(Info1)['lstData']
+        longitude1 = float(lt.getElement(longitude1,1)['longitude'])
+        longitudeCapital = me.getValue(InfoCapital)['lstData']
+        longitudeCapital = float(lt.getElement(longitudeCapital,1)['CapitalLongitude'])
+        loc1=latitude1,longitude1
+        loc2=latitudeCapital,longitudeCapital
+        distance = hs.haversine(loc1,loc2)
+        distance *= 1000
+        return distance
+    except:
+        pass
 
 #Funciones Comparacion
 
@@ -261,5 +309,5 @@ def CapacityOrder(listaOrdenada):
     sorted_list = Merge.sort(sub_list, cmpCapacitys)
     return sorted_list
 
-def cmpCapacitys(video1, video2):
-    return video1 < video2
+def cmpCapacitys(capacitys1, capacitys2):
+    return capacitys1[1] < capacitys2[1]
