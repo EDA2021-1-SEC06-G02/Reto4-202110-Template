@@ -157,6 +157,8 @@ def addRouteConnections(analyzer):
                 addConnectionCapacity(analyzer, prevCableName, CableName, capacity)
                 addConnectionDistance(analyzer, prevCableName, capitalInfo, CapitalDistance)
                 addConnectionCapacity(analyzer, prevCableName, capitalInfo, capacity)
+                addConnectionDistance(analyzer, CableName, capitalInfo, CapitalDistance)
+                addConnectionCapacity(analyzer, CableName, capitalInfo, capacity)
             prevCableName = CableName
 
 def addConnectionDistance(analyzer, origin, destination, distance):
@@ -178,7 +180,7 @@ def addInternalConnections(analyzer):
     ltPorConectar = lt.newList('ARRAY_LIST',cmpfunction=compareroutes)
     ltVertices = gr.vertices(analyzer['connectionsDistance'])
     #print(gr.vertices(analyzer['connectionsDistance']))
-    #print(gr.degree(analyzer['connectionsDistance'],'5848-ARCOS'))
+    print(gr.degree(analyzer['connectionsDistance'],'Russia'))
     for element in lt.iterator(ltVertices):
         if gr.degree(analyzer['connectionsDistance'],element)==0:
             if not lt.isPresent(ltPorConectar,element):
@@ -223,6 +225,7 @@ def ObtenerPais(analyzer,key):
         value = lt.getElement(me.getValue(value)['lstData'],1)['name']
         nameCountry = value.split(',')
         nameCountry = nameCountry[len(nameCountry)-1].strip()
+        #print(nameCountry)
         return nameCountry
 
 # Funciones de consulta
