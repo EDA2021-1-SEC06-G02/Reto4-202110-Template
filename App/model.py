@@ -77,14 +77,11 @@ def addLandingConnection(analyzer, Entry):
     try:
         origin = formatVertexOring(Entry)
         destination = formatVertexDestination(Entry)
-        capitalInfo = formatVertexCapital(analyzer,Entry)
         distance = CalculateDistance(analyzer,Entry)
         addLandingVertexDistance(analyzer, origin)
         addLandingVertexDistance(analyzer, destination)
-        addLandingVertexDistance(analyzer, capitalInfo)
         addLandingVertexCapacity(analyzer, origin)
         addLandingVertexCapacity(analyzer, destination)
-        addLandingVertexCapacity(analyzer, capitalInfo)
         addConnectionDistance(analyzer, origin, destination, distance)
         capacity = Entry['capacityTBPS']
         addConnectionCapacity(analyzer, origin, destination,capacity)
@@ -110,6 +107,7 @@ def AddCountry(Analyzer,country):
         CaracEntry = me.getValue(entry)
     lt.addLast(CaracEntry['lstData'], country)
     mp.put(Analyzer['LandingPoint'],Name,CaracEntry)
+    addLandingVertexDistance(Analyzer, Name)
     return Analyzer
 
 def addLandingVertexDistance(analyzer, LandingId):
@@ -182,7 +180,6 @@ def addInternalConnections(analyzer):
     #print(gr.vertices(analyzer['connectionsDistance']))
     #print(gr.degree(analyzer['connectionsDistance'],'5848-ARCOS'))
     for element in lt.iterator(ltVertices):
-        print(element)
         if gr.degree(analyzer['connectionsDistance'],element)==0:
             if not lt.isPresent(ltPorConectar,element):
                 lt.addLast(ltPorConectar,element)
