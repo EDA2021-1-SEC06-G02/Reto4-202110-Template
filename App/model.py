@@ -175,6 +175,20 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
         return analyzer
     except:
         pass
+
+def addInternalConnections(analyzer):
+    ltPorConectar = lt.newList('ARRAY_LIST',cmpfunction=compareroutes)
+    ltVertices = gr.vertices(analyzer['connectionsDistance'])
+    #print(gr.vertices(analyzer['connectionsDistance']))
+    #print(gr.degree(analyzer['connectionsDistance'],'5848-ARCOS'))
+    for element in lt.iterator(ltVertices):
+        print(element)
+        if gr.degree(analyzer['connectionsDistance'],element)==0:
+            if not lt.isPresent(ltPorConectar,element):
+                lt.addLast(ltPorConectar,element)
+    print(ltPorConectar)
+    return analyzer
+
 # Funciones para creacion de datos
 
 def CreateLandingInfo():

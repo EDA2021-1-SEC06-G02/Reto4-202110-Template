@@ -22,6 +22,7 @@
 
 import config as cf
 import sys
+import threading
 import controller
 from DISClib.ADT import list as lt
 import time
@@ -29,6 +30,8 @@ from DISClib.ADT.graph import gr
 assert cf
 
 
+
+sys.setrecursionlimit(2 ** 20)
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
