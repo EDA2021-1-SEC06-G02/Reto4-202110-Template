@@ -44,12 +44,12 @@ def loadData(analyzer):
     File2 = cf.data_dir + File2
     File3 = cf.data_dir + File3
     input_file = csv.DictReader(open(File3, encoding="utf-8"), delimiter=",")
-    contador=1
+    Primer_elemento=True
     for Entry in input_file:
         model.AddLandingPointsData(analyzer, Entry)
-        if contador==1:
+        if Primer_elemento==True:
             InfoPrimero=Entry
-        contador+=1
+            Primer_elemento = False
     input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
     for Entry in input_file:
         model.AddCountry(analyzer, Entry)

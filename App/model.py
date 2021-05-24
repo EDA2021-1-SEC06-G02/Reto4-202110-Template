@@ -73,23 +73,6 @@ def AddLandingPointsData(analyzer, Entry):
     mp.put(analyzer['LandingPoint'],Entry['landing_point_id'],CaracEntry)
     return analyzer
 
-def addLandingConnection(analyzer, Entry):
-    try:
-        origin = formatVertexOring(Entry)
-        destination = formatVertexDestination(Entry)
-        distance = CalculateDistance(analyzer,Entry)
-        addLandingVertexDistance(analyzer, origin)
-        addLandingVertexDistance(analyzer, destination)
-        addLandingVertexCapacity(analyzer, origin)
-        addLandingVertexCapacity(analyzer, destination)
-        addConnectionDistance(analyzer, origin, destination, distance)
-        capacity = Entry['capacityTBPS']
-        addConnectionCapacity(analyzer, origin, destination,capacity)
-        addLandingsRoutes(analyzer, Entry)
-        return analyzer
-    except Exception as exp:
-        error.reraise(exp, 'model:addLandingConnection')
-
 def AddCountry(Analyzer,country):
     Name = country['CountryName']
     existName = mp.contains(Analyzer['countriesInfo'], Name)
@@ -109,6 +92,23 @@ def AddCountry(Analyzer,country):
     mp.put(Analyzer['LandingPoint'],Name,CaracEntry)
     addLandingVertexDistance(Analyzer, Name)
     return Analyzer
+
+def addLandingConnection(analyzer, Entry):
+    try:
+        origin = formatVertexOring(Entry)
+        destination = formatVertexDestination(Entry)
+        distance = CalculateDistance(analyzer,Entry)
+        addLandingVertexDistance(analyzer, origin)
+        addLandingVertexDistance(analyzer, destination)
+        addLandingVertexCapacity(analyzer, origin)
+        addLandingVertexCapacity(analyzer, destination)
+        addConnectionDistance(analyzer, origin, destination, distance)
+        capacity = Entry['capacityTBPS']
+        addConnectionCapacity(analyzer, origin, destination,capacity)
+        addLandingsRoutes(analyzer, Entry)
+        return analyzer
+    except Exception as exp:
+        error.reraise(exp, 'model:addLandingConnection')
 
 def addLandingVertexDistance(analyzer, LandingId):
     try:

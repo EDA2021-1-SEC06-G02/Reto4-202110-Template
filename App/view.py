@@ -30,7 +30,6 @@ from DISClib.ADT.graph import gr
 assert cf
 
 
-
 sys.setrecursionlimit(2 ** 20)
 """
 La vista se encarga de la interacción con el usuario
@@ -39,8 +38,9 @@ se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
 
+#Puros prints
 def printMenu():
-    print("Bienvenido")
+    print("\nBienvenido")
     print("1- Inicializar catálogo")
     print("2- Cargar información en el catálogo")
     print("3- Encontrar la cantidad de clústeres")
@@ -52,6 +52,17 @@ def printMenu():
     print("9- Encontrar la ruta mínima en número de saltos para enviar información")
     print("10- Graficar mapa resultados requerimientos")
 
+def printDatosCargados(TotLanding,TotConexiones,TotCountries,InfoPrimerLanding,InfoUltimoPais,time_mseg):
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    print("Se cargaron:",TotLanding,"landing points.")
+    print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
+    print("Se cargaron:",TotCountries,"paises.")
+    print("Informacion primer landing point cargado-> " + InfoPrimerLanding)
+    print("Información ultimo pais cargado-> " + InfoUltimoPais)
+    print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    input("Enter para continuar")
+
 catalog = None
 
 """
@@ -61,12 +72,14 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
         t1 = time.process_time()
         catalog = controller.newAnalyzer()
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
+        print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
         print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+        print("Catalogo inicializado correctamente.")
+        print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
 
     elif int(inputs[0]) == 2:
         t1 = time.process_time()
@@ -74,16 +87,7 @@ while True:
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
         TotCountries,TotLanging,TotConexiones = controller.InfoCatalog(catalog)
-        print("---------------------------------------------------------------------------------------------------------------------------------------------------------")
-        print("Se cargaron:",TotLanging,"landing points.")
-        print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
-        print("Se cargaron:",TotCountries,"paises.")
-        print(InfoPrimerLanding)
-        print(InfoUltimoPais)
-        print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
-        print("---------------------------------------------------------------------------------------------------------------------------------------------------------")
-        input("Enter para continuar")
-
+        printDatosCargados(TotLanging,TotConexiones,TotCountries,InfoPrimerLanding,InfoUltimoPais,time_mseg)
 
     elif int(inputs[0]) == 3:
         pass
