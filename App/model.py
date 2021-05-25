@@ -47,7 +47,7 @@ los mismos.
 
 def newAnalyzer():
     try:
-        analyzer = {'LandingPoint': None,'connectionsDistance': None,'connectionsCapacity': None,'countrysInfo':None}
+        analyzer = {'LandingPoint': None, 'connectionsDistance': None, 'connectionsCapacity': None, 'countrysInfo':None, 'components': None,}
 
         analyzer['LandingPoint'] = mp.newMap(numelements=1290,maptype='PROBING',comparefunction=compareCountryNames)
 
@@ -187,6 +187,33 @@ def addInternalConnections(analyzer):
                 lt.addLast(ltPorConectar,element)
     print(ltPorConectar)
     return analyzer
+
+#IDK
+
+def ComponentesConectados(catalog):
+    catalog['components'] = scc.KosarajuSCC(catalog["connectionsDistance"])
+    return scc.connectedComponents(catalog['components'])
+
+def mismoCluster(catalog, landing1, landing2):
+    respuesta = scc.stronglyConnected(catalog['components'], landing1, landing2)
+    return respuesta
+
+def obtenerNombreVertex(catalog, landing1, landing2):
+    #NO FUNCIONA PQ LA TABLA DE HASH catalog["LandingPoint"] TIENE COMO LLAVE EL ID, NO EL NOMBRE
+    #TIENE VARIOS ERRORES
+    landing1 = me.getValue(mp.get(catalog["LandingPoint"],landing1))
+    landing2 = me.getValue(mp.get(catalog["LandingPoint"],landing2))
+    cable = ""
+    i = 1
+    encontrado = False
+    while i <= lt.size(landing1['lstCables']) and not(encontrado):
+        if(lt.isPresent(landing2['lstCables'],lt.getElement(landing1['lstCables'],i))):
+            encontrado = True
+            cable = lt.getElement(landing1['lstCables'],i)
+        i += 1
+    vertex1 = landing1['lstData']["landing_point_id"] + "-" + cable
+    vertex2 = landing2['lstData']["landing_point_id"] + "-" + cable
+    return vertex1, vertex2
 
 # Funciones para creacion de datos
 

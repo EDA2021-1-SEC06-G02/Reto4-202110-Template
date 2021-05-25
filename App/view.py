@@ -52,13 +52,13 @@ def printMenu():
     print("9- Encontrar la ruta mínima en número de saltos para enviar información")
     print("10- Graficar mapa resultados requerimientos")
 
-def printDatosCargados(TotLanding,TotConexiones,TotCountries,InfoPrimerLanding,InfoUltimoPais,time_mseg):
+def printDatosCargados(TotLanding,TotConections,TotCountries,InfoFirstLanding,InfoLastCountry,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     print("Se cargaron:",TotLanding,"landing points.")
-    print("Se cargaron:",TotConexiones,"conexiones entre los landing points.")
+    print("Se cargaron:",TotConections,"conexiones entre los landing points.")
     print("Se cargaron:",TotCountries,"paises.")
-    print("Informacion primer landing point cargado-> " + InfoPrimerLanding)
-    print("Información ultimo pais cargado-> " + InfoUltimoPais)
+    print("Informacion primer landing point cargado-> " + InfoFirstLanding)
+    print("Información ultimo pais cargado-> " + InfoLastCountry)
     print("Tiempo de ejecucion:",time_mseg,"milisegundos.")
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
@@ -83,14 +83,29 @@ while True:
 
     elif int(inputs[0]) == 2:
         t1 = time.process_time()
-        catalog,InfoPrimerLanding,InfoUltimoPais = controller.loadData(catalog)
+        catalog,InfoFirstLanding,InfoLastCountry = controller.loadData(catalog)
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
-        TotCountries,TotLanging,TotConexiones = controller.InfoCatalog(catalog)
-        printDatosCargados(TotLanging,TotConexiones,TotCountries,InfoPrimerLanding,InfoUltimoPais,time_mseg)
+        TotCountries,TotLanding,TotConections = controller.InfoCatalog(catalog)
+        printDatosCargados(TotLanding,TotConections,TotCountries,InfoFirstLanding,InfoLastCountry,time_mseg)
 
     elif int(inputs[0]) == 3:
-        pass
+        t1 = time.process_time()
+        landing1 = input("Ingrese el nombre del primer Landing Point: ")
+        landing2 = input("Ingrese el nombre del segundo Landing Point: ")
+        numeroComponentes = controller.ComponentesConectados(catalog)
+        """vertex1, vertex2 = controller.obtenerNombreVertex(catalog, landing1, landing2)"""
+        """mismo_clus = controller.mismoCluster(catalog, vertex1, vertex2)"""
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+        print("El numero total de clusteres presentes en la red es: " + str(numeroComponentes))
+        """if(mismo_clus == True):
+            print("Los dos landing points indicados están en el mismo cluster.")
+        else:
+            print("Los dos landing points indicados están en el mismo cluster.")"""
+        print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+        print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
 
     elif int(inputs[0]) == 4:
         pass
