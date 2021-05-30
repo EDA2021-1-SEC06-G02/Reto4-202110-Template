@@ -71,6 +71,9 @@ def GenerarComponentesConectados(catalog):
 def mismoCluster(catalog, landing1, landing2):
     return model.mismoCluster(catalog, landing1, landing2)
 
+def LandingMoreCables(catalog):
+    return model.LandingMoreCables(catalog)
+
 # Funciones de consulta sobre el catálogo
 
 def InfoCatalog(analyzer):

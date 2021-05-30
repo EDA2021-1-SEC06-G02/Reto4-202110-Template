@@ -219,6 +219,22 @@ def mismoCluster(catalog, landing1, landing2):
                 j+=1
             i+=1
     return encontrado
+
+def LandingMoreCables(catalog):
+    LandingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+    maxCables = 0
+    landings = mp.keySet(catalog["LandingPointI"])
+    for landing in lt.iterator(landings):
+        datosLanding = lt.getElement(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstData'],1)
+        cables = lt.size(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstCables'])
+        if cables > maxCables:
+            maxCables = cables
+            LandingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+            lt.addLast(LandingMoreCables,datosLanding)
+        elif(cables == maxCables):
+            lt.addLast(LandingMoreCables,datosLanding)
+    return LandingMoreCables, maxCables
+
 # Funciones para creacion de datos
 
 def CreateLandingInfo():

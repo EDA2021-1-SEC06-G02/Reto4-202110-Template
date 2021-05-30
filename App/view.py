@@ -77,6 +77,20 @@ def printReq1(numeroComponentes,mismo_clus,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
 
+def printReq2(numero,LandingMoreCables,time_mseg):
+    formato1 = "Los siguiente landings son un punto de interconexion a {} cables en la red:"
+    formato2 = "-> Nombre: {}, identificador: {}, país: {}"
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    print(formato1.format(numero))
+    for landing in lt.iterator(LandingMoreCables):
+        nombre = landing["name"]
+        id1 = landing["landing_point_id"]
+        pais = landing["name"].split(",")[1].strip()
+        print(formato2.format(nombre,id1,pais))
+    print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    input("Enter para continuar")
+
 catalog = None
 
 """
@@ -103,7 +117,8 @@ while True:
         time_mseg = (t2 - t1)*1000
         TotCountries,TotLanding,TotConections = controller.InfoCatalog(catalog)
         printDatosCargados(TotLanding,TotConections,TotCountries,InfoFirstLanding,InfoLastCountry,time_mseg)
-
+    
+    #Req 1
     elif int(inputs[0]) == 3:
         t1 = time.process_time()
         landing1 = input("Ingrese el nombre del primer Landing Point: ")
@@ -116,8 +131,13 @@ while True:
         time_mseg = (t2 - t1)*1000
         printReq1(numeroComponentes,mismo_clus,time_mseg)
 
+    #Req 2
     elif int(inputs[0]) == 4:
-        pass
+        t1 = time.process_time()
+        LandingMoreCables, numero = controller.LandingMoreCables(catalog)
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        printReq2(numero,LandingMoreCables,time_mseg)
 
     elif int(inputs[0]) == 5:
         pass
