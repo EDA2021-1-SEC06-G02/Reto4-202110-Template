@@ -74,9 +74,12 @@ def AddLandingPointsData(analyzer, Entry):
     lt.addLast(CaracEntry['lstData'], Entry)
     mp.put(analyzer['LandingPointI'],Entry['landing_point_id'],CaracEntry)
     mp.put(analyzer['LandingPointN'],Entry['name'],CaracEntry)
+#    ObtenerPais(analyzer)
     return analyzer
 
 def AddCountry(Analyzer,country):
+    """Agregamos el país a una tabla de hash con Llave igual al nombre del país,
+    esta tabla contendrá la información existente en la lectura del archivo de Countries."""
     Name = country['CountryName']
     existName = mp.contains(Analyzer['countriesInfo'], Name)
     if existName:
@@ -84,17 +87,22 @@ def AddCountry(Analyzer,country):
         NameCountry = me.getValue(entry)
     else:
         NameCountry = newCountryValues()
-    mp.put(Analyzer['countriesInfo'], Name, NameCountry)
     lt.addLast(NameCountry['countriesInfo'], country)
-    entry = mp.get(Analyzer['LandingPointI'], Name)
-    if entry is None:
-        CaracEntry = CreateLandingInfo()
+    mp.put(Analyzer['countriesInfo'], Name, NameCountry)
+    """Agregamos el país a la tabla que contiene los landing points, el nombre de este landing point
+    será el nombre del país y representará a la capital de este. Estos landing Poinst especiales 
+    tendran una estrucutra diferente a la de los landing normales."""
+    existLandingCountry = mp.contains(Analyzer['LandingPointI'], Name)
+    if existLandingCountry:
+        entry=mp.get(Analyzer['LandingPointI'], Name)
+        LandingCountry = me.getValue(entry)
     else:
-        CaracEntry = me.getValue(entry)
-    lt.addLast(CaracEntry['lstData'], country)
-    mp.put(Analyzer['LandingPointI'],Name,CaracEntry)
-    mp.put(Analyzer['LandingPointN'],Name,CaracEntry)
+        LandingCountry = CreateLandingCountriesInfo()
+    lt.addLast(LandingCountry['lstLocation'], country['CapitalLatitude'])
+    lt.addLast(LandingCountry['lstLocation'], country['CapitalLongitude'])
+    mp.put(Analyzer['LandingPointI'],Name,LandingCountry)
     addLandingVertexDistance(Analyzer, Name)
+    addLandingVertexCapacity(Analyzer, Name)
     return Analyzer
 
 def addLandingConnection(analyzer, Entry):
@@ -151,8 +159,7 @@ def addRouteConnections(analyzer):
         lstCables = mp.get(analyzer['LandingPointI'], key)
         lstCables = me.getValue(lstCables)['lstCables']
         lstCables = CapacityOrder(lstCables)
-        capitalInfo = ObtenerPais(analyzer,key)
-        CapitalDistance = CalculateDistanceCapital(analyzer,key,capitalInfo)
+        #CapitalDistance = CalculateDistanceCapital(analyzer,key,capitalInfo)
         prevCableName = None
         for CableName in lt.iterator(lstCables):
             CableName = key + '-' + CableName[0]
@@ -160,10 +167,10 @@ def addRouteConnections(analyzer):
             if prevCableName is not None:
                 addConnectionDistance(analyzer, prevCableName, CableName, 100)
                 addConnectionCapacity(analyzer, prevCableName, CableName, capacity)
-                addConnectionDistance(analyzer, prevCableName, capitalInfo, CapitalDistance)
+                """addConnectionDistance(analyzer, prevCableName, capitalInfo, CapitalDistance)
                 addConnectionCapacity(analyzer, prevCableName, capitalInfo, capacity)
                 addConnectionDistance(analyzer, CableName, capitalInfo, CapitalDistance)
-                addConnectionCapacity(analyzer, CableName, capitalInfo, capacity)
+                addConnectionCapacity(analyzer, CableName, capitalInfo, capacity)"""
             prevCableName = CableName
 
 def addConnectionDistance(analyzer, origin, destination, distance):
@@ -238,9 +245,16 @@ def LandingMoreCables(catalog):
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
-    entry = {'lstData':None,'lstCables':None}
+    entry = {'lstData':None,'lstCables':None,'lstLocation':None}
     entry['lstData'] = lt.newList('ARRAY_LIST')
     entry['lstCables'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
+    entry['lstLocation'] = lt.newList('ARRAY_LIST')
+    return entry
+
+def CreateLandingCountriesInfo():
+    entry = {'lstLandings':None,'lstLocation':None}
+    entry['lstLandings'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
+    entry['lstLocation'] = lt.newList('ARRAY_LIST')
     return entry
 
 def newCountryValues():

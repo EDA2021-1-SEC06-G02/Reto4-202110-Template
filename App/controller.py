@@ -37,23 +37,23 @@ def newAnalyzer():
 # Funciones para la carga de datos
 
 def loadData(analyzer):
+    Primer_elemento=True
     File = "connections.csv"
     File2= "countries.csv"
     File3= "landing_points.csv"
     File = cf.data_dir + File
     File2 = cf.data_dir + File2
     File3 = cf.data_dir + File3
+    input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
+    for Entry in input_file:
+        model.AddCountry(analyzer, Entry)
+        InfoUltimo=Entry
     input_file = csv.DictReader(open(File3, encoding="utf-8"), delimiter=",")
-    Primer_elemento=True
     for Entry in input_file:
         model.AddLandingPointsData(analyzer, Entry)
         if Primer_elemento==True:
             InfoPrimero=Entry
             Primer_elemento = False
-    input_file = csv.DictReader(open(File2, encoding="utf-8"), delimiter=",")
-    for Entry in input_file:
-        model.AddCountry(analyzer, Entry)
-        InfoUltimo=Entry
     input_file = csv.DictReader(open(File, encoding="utf-8-sig"), delimiter=",")
     for Entry in input_file:
         model.addLandingConnection(analyzer, Entry)
