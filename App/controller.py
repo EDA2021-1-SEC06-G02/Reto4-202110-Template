@@ -65,16 +65,16 @@ def loadData(analyzer):
 
 # Funciones de ordenamiento
 
-def ComponentesConectados(catalog):
-    return model.ComponentesConectados(catalog)
+def GenerarComponentesConectados(catalog):
+    return model.GenerarComponentesConectados(catalog)
 
 def mismoCluster(catalog, landing1, landing2):
     return model.mismoCluster(catalog, landing1, landing2)
-
-def obtenerNombreVertex(catalog, landing1, landing2):
-    return model.obtenerNombreVertex(catalog, landing1, landing2)
 
 # Funciones de consulta sobre el catálogo
 
 def InfoCatalog(analyzer):
     return model.InfoCatalog(analyzer)
+
+def NumSCC(catalog):
+    return model.NumSCC(catalog)
