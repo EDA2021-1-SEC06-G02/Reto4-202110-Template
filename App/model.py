@@ -195,7 +195,7 @@ def addInternalConnections(analyzer):
 
 #IDK
 
-def GenerarComponentesConectados(catalog):
+def generarComponentesConectados(catalog):
     catalog['components'] = scc.KosarajuSCC(catalog["connectionsDistance"])
     return catalog
 
@@ -220,8 +220,8 @@ def mismoCluster(catalog, landing1, landing2):
             i+=1
     return encontrado
 
-def LandingMoreCables(catalog):
-    LandingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+def landingMoreCables(catalog):
+    landingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
     maxCables = 0
     landings = mp.keySet(catalog["LandingPointI"])
     for landing in lt.iterator(landings):
@@ -229,11 +229,20 @@ def LandingMoreCables(catalog):
         cables = lt.size(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstCables'])
         if cables > maxCables:
             maxCables = cables
-            LandingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
-            lt.addLast(LandingMoreCables,datosLanding)
+            landingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+            lt.addLast(landingMoreCables,datosLanding)
         elif(cables == maxCables):
-            lt.addLast(LandingMoreCables,datosLanding)
-    return LandingMoreCables, maxCables
+            lt.addLast(landingMoreCables,datosLanding)
+    return landingMoreCables, maxCables
+
+def caminosMinimos(catalog,Fuente):
+    caminoMin = djk.Dijkstra(catalog["connectionsDistance"],Fuente)
+    return caminoMin
+
+def caminoMin(caminosMinimos,Pais2):
+    camino = djk.pathTo(caminosMinimos,Pais2)
+    distancia = djk.distTo(caminosMinimos,Pais2)
+    return camino, distancia
 
 # Funciones para creacion de datos
 

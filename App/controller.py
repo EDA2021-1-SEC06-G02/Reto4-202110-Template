@@ -65,14 +65,20 @@ def loadData(analyzer):
 
 # Funciones de ordenamiento
 
-def GenerarComponentesConectados(catalog):
+def generarComponentesConectados(catalog):
     return model.GenerarComponentesConectados(catalog)
 
 def mismoCluster(catalog, landing1, landing2):
     return model.mismoCluster(catalog, landing1, landing2)
 
-def LandingMoreCables(catalog):
-    return model.LandingMoreCables(catalog)
+def landingMoreCables(catalog):
+    return model.landingMoreCables(catalog)
+
+def caminosMinimos(catalog,Fuente):
+    return model.caminosMinimos(catalog,Fuente)
+
+def caminoMin(caminosMinimos,Pais2):
+    return model.caminoMin(caminosMinimos,Pais2)
 
 # Funciones de consulta sobre el catálogo
 

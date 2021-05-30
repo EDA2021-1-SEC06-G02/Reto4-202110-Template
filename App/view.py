@@ -91,6 +91,17 @@ def printReq2(numero,LandingMoreCables,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
 
+def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
+    formato1 = "La distancia total desde {} hasta {} es de {} metros."
+    formato2 = "-> Nombre: {}, identificador: {}, país: {}"
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    print(formato1.format(Pais1,Pais2,distancia))
+    print("El camino a realizar es:")
+    print(camino)
+    print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    input("Enter para continuar")
+
 catalog = None
 
 """
@@ -124,7 +135,7 @@ while True:
         landing1 = input("Ingrese el nombre del primer Landing Point: ")
         landing2 = input("Ingrese el nombre del segundo Landing Point: ")
         if catalog["components"] == None:
-            catalog = controller.GenerarComponentesConectados(catalog)
+            catalog = controller.generarComponentesConectados(catalog)
         numeroComponentes = controller.NumSCC(catalog)
         mismo_clus = controller.mismoCluster(catalog, landing1, landing2)
         t2 = time.process_time()
@@ -134,17 +145,27 @@ while True:
     #Req 2
     elif int(inputs[0]) == 4:
         t1 = time.process_time()
-        LandingMoreCables, numero = controller.LandingMoreCables(catalog)
+        landingMoreCables, numero = controller.landingMoreCables(catalog)
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
-        printReq2(numero,LandingMoreCables,time_mseg)
+        printReq2(numero,landingMoreCables,time_mseg)
 
+    #Req 3
     elif int(inputs[0]) == 5:
-        pass
+        t1 = time.process_time()
+        Pais1 = input("Ingrese el nombre del primer País: ")
+        Pais2 = input("Ingrese el nombre del segundo País: ")
+        caminosMinimos = controller.caminosMinimos(catalog,Pais1)
+        camino, distancia = controller.caminoMin(caminosMinimos,Pais2)
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        printReq3(Pais1,Pais2,camino,distancia,time_mseg)
 
+    #Req 4
     elif int(inputs[0]) == 6:
         pass
 
+    #Req 5
     elif int(inputs[0]) == 7:
         pass
 
