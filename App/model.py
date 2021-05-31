@@ -220,6 +220,9 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
     return analyzer
 
 def addContinentConnection(analyzer):
+    """Se consultan cuales nodos del grafo tiene grado 0 y se les realizan las comparaciones necesarias
+    para encontrar la distancia de los landing points para encontrar el camino más cercano en KM a las 
+    capitales de interés."""
     ltVertices = gr.vertices(analyzer['connectionsDistance'])
     for element in lt.iterator(ltVertices):
         if gr.degree(analyzer['connectionsDistance'],element)==0:
