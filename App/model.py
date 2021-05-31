@@ -66,6 +66,10 @@ def newAnalyzer():
 # Funciones para agregar informacion al catalogo
 
 def AddLandingPointsData(Analyzer, Entry):
+    """Se cargan los landings points en la tabla de hash con llave Landing_Point_ID para que sea mas sencillo
+    de encontrar con los datos brindados en el archivo de connections. Se agregan a una segunda tabla de hash
+    el nombre del landing point como llave y como valor el ID del landgin point para facilitar las consultas de
+    de ciertos requerimientos."""
     ID=Entry['landing_point_id']
     paisLanding = Entry['name']
     paisLanding = paisLanding.split(',')
