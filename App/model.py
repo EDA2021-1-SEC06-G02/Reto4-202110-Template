@@ -159,19 +159,20 @@ def addLandingVertexCapacity(analyzer, LandingId):
         error.reraise(exp, 'model:addLandingVertex')
 
 def addLandingsRoutes(analyzer, Entry):
-    entry = mp.get(analyzer['LandingPointI'], Entry['origin'])
-    try:
-        entry = me.getValue(entry)
-        CableName = Entry['cable_name']
-        CapacityValue = Entry['capacityTBPS']
-        Value = (CableName,CapacityValue)
-        if not lt.isPresent(entry['lstCables'], Value):
-            lt.addLast(entry['lstCables'], Value)
-        mp.put(analyzer['LandingPointI'], Entry['origin'], entry)
-        mp.put(analyzer['LandingPointN'], Entry['origin'], entry)
-        return analyzer
-    except Exception as exp:
-        error.reraise(exp, 'model:InexistenciaLanding')
+    Origin = mp.get(analyzer['LandingPointI'], Entry['origin'])
+    Destination = mp.get(analyzer['LandingPointI'], Entry['destination'])
+    Originentry = me.getValue(Origin)
+    Destinationentry = me.getValue(Destination)
+    CableName = Entry['cable_name']
+    CapacityValue = Entry['capacityTBPS']
+    Value = (CableName,CapacityValue)
+    if not lt.isPresent(Originentry['lstCables'], Value):
+        lt.addLast(Originentry['lstCables'], Value)
+    if not lt.isPresent(Destinationentry['lstCables'], Value):
+        lt.addLast(Destinationentry['lstCables'], Value)
+    mp.put(analyzer['LandingPointI'], Entry['origin'], Originentry)
+    mp.put(analyzer['LandingPointI'], Entry['destination'], Destinationentry)
+    return analyzer
 
 def addRouteConnections(analyzer):
     lststops = mp.keySet(analyzer['LandingPointI'])
@@ -200,13 +201,10 @@ def addConnectionDistance(analyzer, origin, destination, distance):
     return analyzer
 
 def addConnectionCapacity(analyzer, origin, destination, Capacity):
-    try:
-        edge = gr.getEdge(analyzer['connectionsCapacity'], origin, destination)
-        if edge is None:
-            gr.addEdge(analyzer['connectionsCapacity'], origin, destination, Capacity)
-        return analyzer
-    except:
-        pass
+    edge = gr.getEdge(analyzer['connectionsCapacity'], origin, destination)
+    if edge is None:
+        gr.addEdge(analyzer['connectionsCapacity'], origin, destination, Capacity)
+    return analyzer
 
 def addInternalConnections(analyzer):
     ltPorConectar = lt.newList('ARRAY_LIST',cmpfunction=compareroutes)
@@ -283,12 +281,12 @@ def newCountryValues():
     return Values
 
 def formatVertexOring(Entry):
-    name = Entry['origin'] + '-'
+    name = Entry['origin'] + '*'
     name = name + Entry['cable_name']
     return name
     
 def formatVertexDestination(Entry):
-    name = Entry['destination'] + '-'
+    name = Entry['destination'] + '*'
     name = name + Entry['cable_name']
     return name
 
@@ -322,22 +320,14 @@ def CalculateDistance(analyzer,Entry):
     destination = Entry['destination']
     Info1 = mp.get(analyzer['LandingPointI'],oring)
     Info2 = mp.get(analyzer['LandingPointI'],destination)
-    try:
-        latitude1 = me.getValue(Info1)['lstData']
-        latitude1 = float(lt.getElement(latitude1,1)['latitude'])
-        latitude2 = me.getValue(Info2)['lstData']
-        latitude2 = float(lt.getElement(latitude2,1)['latitude'])
-    except:
-        pass
-    try:
-        longitude1 = me.getValue(Info1)['lstData']
-        longitude1 = float(lt.getElement(longitude1,1)['longitude'])
-        longitude2 = me.getValue(Info2)['lstData']
-        longitude2 = float(lt.getElement(longitude2,1)['longitude'])
-    except:
-        pass
-    loc1=latitude1,longitude1
-    loc2=latitude2,longitude2
+    Coor1 = me.getValue(Info1)['lstLocation']
+    Coor2 = me.getValue(Info2)['lstLocation']
+    lat1 = float(lt.getElement(Coor1,1))
+    lon1 = float(lt.getElement(Coor1,2))
+    lat2 = float(lt.getElement(Coor2,1))
+    lon2 = float(lt.getElement(Coor2,2))
+    loc1=lat1,lon1
+    loc2=lat2,lon2
     distance = hs.haversine(loc1,loc2)
     distance *= 1000
     return distance
@@ -410,3 +400,11 @@ def CapacityOrder(listaOrdenada):
 
 def cmpCapacitys(capacitys1, capacitys2):
     return capacitys1[1] < capacitys2[1]
+
+"""
+for key in lt.iterator(mp.keySet(analyzer['LandingPointI'])):
+        if mp.contains(analyzer['countriesInfo'],key):
+            value = mp.get(analyzer['LandingPointI'],key)
+            value = me.getValue(value)['lstLandings']
+            if lt.size(value)==0:
+                print(key)"""
