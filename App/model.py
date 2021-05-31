@@ -59,8 +59,6 @@ def newAnalyzer():
 
         analyzer['countriesInfo'] = mp.newMap(numelements=240, maptype='PROBING', comparefunction=compareCountryNames)
 
-        analyzer['ContinetsInfo'] = mp.newMap(numelements=7, maptype='PROBING', comparefunction=compareCountryNames)
-
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -125,17 +123,6 @@ def AddCountry(Analyzer,country):
     mp.put(Analyzer['LandingPointI'],Name,LandingCountry)
     addLandingVertexDistance(Analyzer, Name)
     addLandingVertexCapacity(Analyzer, Name)
-    """Agregamos cada país a la tabla de hash de su respectivo continente"""
-    ContinentName = country['ContinentName']
-    existContinent = mp.contains(Analyzer['ContinetsInfo'], ContinentName)
-    if existContinent:
-        entry = mp.get(Analyzer['ContinetsInfo'], ContinentName)
-        ContinentInfo = me.getValue(entry)
-    else:
-        ContinentInfo = newContinentValues()
-    if not lt.isPresent(ContinentInfo['ContinentCountries'], Name):
-        lt.addLast(ContinentInfo['ContinentCountries'], Name)
-    mp.put(Analyzer['ContinetsInfo'], ContinentName, ContinentInfo)
     return Analyzer
 
 def addLandingConnection(analyzer, Entry):
@@ -235,14 +222,7 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
 def addContinentConnection(analyzer):
     ltVertices = gr.vertices(analyzer['connectionsDistance'])
     for element in lt.iterator(ltVertices):
-        if element == 'Palestine':
-            minElementInfo = mp.get(analyzer['LandingPointI'],'Israel')
-            capacity = me.getValue(minElementInfo)['MinCapacity_Landing']
-            addConnectionDistance(analyzer, 'Palestine', 'Israel', 100)
-            addConnectionDistance(analyzer, 'Israel', 'Palestine', 100)
-            addConnectionCapacity(analyzer, 'Palestine', 'Israel', capacity)
-            addConnectionCapacity(analyzer, 'Israel', 'Palestine', capacity)
-        elif gr.degree(analyzer['connectionsDistance'],element)==0:
+        if gr.degree(analyzer['connectionsDistance'],element)==0:
             primero = True
             minElement = ""
             minDistance = 0
@@ -251,6 +231,8 @@ def addContinentConnection(analyzer):
             for key in lt.iterator(lstLandingPoints):
                 if not (key == element):
                     distance = CalculateDistance(analyzer,element,key)
+                    if distance == 0:
+                        distance = 100
                     if primero:
                         minDistance = distance
                         minElement = key
