@@ -34,6 +34,7 @@ from DISClib.ADT.graph import gr
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+import math
 from DISClib.Algorithms.Sorting import mergesort as Merge
 import haversine as hs
 assert cf
@@ -53,9 +54,9 @@ def newAnalyzer():
 
         analyzer['LandingPointN'] = mp.newMap(numelements=1290,maptype='PROBING',comparefunction=compareCountryNames)
 
-        analyzer['connectionsDistance'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
+        analyzer['connectionsDistance'] = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
 
-        analyzer['connectionsCapacity'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
+        analyzer['connectionsCapacity'] = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
 
         analyzer['countriesInfo'] = mp.newMap(numelements=240, maptype='PROBING', comparefunction=compareCountryNames)
 
@@ -200,6 +201,10 @@ def generarComponentesConectados(catalog):
     return catalog
 
 def mismoCluster(catalog, landing1, landing2):
+    """ Revisamos que existan los dos landings points que llegan por parametro. Si no existe alguno
+    de los dos se retorna 'NE'. Si existen ambos probamos todas las combinaciones posibles <landing_id-cable>
+    para cada uno de los landings para saber si ambos están en un mismo componente fuertemente conectado.
+    Retorna True si están en el mismo y False de lo contrario"""
     landing1 = mp.get(catalog["LandingPointN"],landing1)
     landing2 = mp.get(catalog["LandingPointN"],landing2)
     encontrado = "NE"
@@ -221,6 +226,10 @@ def mismoCluster(catalog, landing1, landing2):
     return encontrado
 
 def landingMoreCables(catalog):
+    """ Se recorren todos los landings points, que se encuentran en la llave 'LandingPointI' del catalogo.
+    Se revisa si el numero de cables que tiene el landing que se está revisando es mayor al mayor que se tiene;
+    si esto sucede este valor se convierte en el nuevo mayor, la lista se pone vacia y se agrega el landing.
+    En caso que tenga el mismo numero de landings que el mayor, el landing se agrega a la lista a retornar."""
     landingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
     maxCables = 0
     landings = mp.keySet(catalog["LandingPointI"])
@@ -240,8 +249,13 @@ def caminosMinimos(catalog,Fuente):
     return caminoMin
 
 def caminoMin(caminosMinimos,Pais2):
+    """ Se consigue la distancia y el camino que conecta la fuente del grafo Caminos minimos con el Pais2.
+    Si la distancia es infinito, lo cual indica que no hay camino, esta se remplaza por -1.
+    #PROXIMAMENTE: Pasar el camino a una lista para que sea facil de imprimir en el view"""
     camino = djk.pathTo(caminosMinimos,Pais2)
     distancia = djk.distTo(caminosMinimos,Pais2)
+    if distancia == math.inf:
+        distancia = -1
     return camino, distancia
 
 # Funciones para creacion de datos

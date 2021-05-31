@@ -66,7 +66,7 @@ def loadData(analyzer):
 # Funciones de ordenamiento
 
 def generarComponentesConectados(catalog):
-    return model.GenerarComponentesConectados(catalog)
+    return model.generarComponentesConectados(catalog)
 
 def mismoCluster(catalog, landing1, landing2):
     return model.mismoCluster(catalog, landing1, landing2)

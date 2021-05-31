@@ -28,6 +28,7 @@ from DISClib.ADT import list as lt
 import time
 from DISClib.ADT.graph import gr
 assert cf
+import math
 
 
 sys.setrecursionlimit(2 ** 20)
@@ -94,10 +95,14 @@ def printReq2(numero,LandingMoreCables,time_mseg):
 def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
     formato1 = "La distancia total desde {} hasta {} es de {} metros."
     formato2 = "-> Nombre: {}, identificador: {}, país: {}"
+    formato3 = "No existe un camino entre {} y {}."
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
-    print(formato1.format(Pais1,Pais2,distancia))
-    print("El camino a realizar es:")
-    print(camino)
+    if (distancia) == -1:
+        print(formato3.format(Pais1,Pais2))
+    else:
+        print(formato1.format(Pais1,Pais2,distancia))
+        print("El camino a realizar es:")
+        print(camino)
     print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
