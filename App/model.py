@@ -226,7 +226,7 @@ def mismoCluster(catalog, landing1, landing2):
     return encontrado
 
 def landingMoreCables(catalog):
-    """ Se recorren todos los landings points, que se encuentran en la llave 'LandingPointI' del catalogo.
+    """ Se recorren todos los landings points que se encuentran en la llave 'LandingPointI' del catalogo.
     Se revisa si el numero de cables que tiene el landing que se está revisando es mayor al mayor que se tiene;
     si esto sucede este valor se convierte en el nuevo mayor, la lista se pone vacia y se agrega el landing.
     En caso que tenga el mismo numero de landings que el mayor, el landing se agrega a la lista a retornar."""
