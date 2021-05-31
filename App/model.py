@@ -59,6 +59,8 @@ def newAnalyzer():
 
         analyzer['countriesInfo'] = mp.newMap(numelements=240, maptype='PROBING', comparefunction=compareCountryNames)
 
+        analyzer['ContinetsInfo'] = mp.newMap(numelements=7, maptype='PROBING', comparefunction=compareCountryNames)
+
         return analyzer
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -104,11 +106,11 @@ def AddCountry(Analyzer,country):
     existName = mp.contains(Analyzer['countriesInfo'], Name)
     if existName:
         entry = mp.get(Analyzer['countriesInfo'], Name)
-        NameCountry = me.getValue(entry)
+        CountryInfo = me.getValue(entry)
     else:
-        NameCountry = newCountryValues()
-    lt.addLast(NameCountry['countriesInfo'], country)
-    mp.put(Analyzer['countriesInfo'], Name, NameCountry)
+        CountryInfo = newCountryValues()
+    lt.addLast(CountryInfo['countriesInfo'], country)
+    mp.put(Analyzer['countriesInfo'], Name, CountryInfo)
     """Agregamos el país a la tabla que contiene los landing points, el nombre de este landing point
     será el nombre del país y representará a la capital de este. Estos landing Poinst especiales 
     tendran una estrucutra diferente a la de los landing normales."""
@@ -123,6 +125,17 @@ def AddCountry(Analyzer,country):
     mp.put(Analyzer['LandingPointI'],Name,LandingCountry)
     addLandingVertexDistance(Analyzer, Name)
     addLandingVertexCapacity(Analyzer, Name)
+    """Agregamos cada país a la tabla de hash de su respectivo continente"""
+    ContinentName = country['ContinentName']
+    existContinent = mp.contains(Analyzer['ContinetsInfo'], ContinentName)
+    if existContinent:
+        entry = mp.get(Analyzer['ContinetsInfo'], ContinentName)
+        ContinentInfo = me.getValue(entry)
+    else:
+        ContinentInfo = newContinentValues()
+    if not lt.isPresent(ContinentInfo['ContinentCountries'], Name):
+        lt.addLast(ContinentInfo['ContinentCountries'], Name)
+    mp.put(Analyzer['ContinetsInfo'], ContinentName, ContinentInfo)
     return Analyzer
 
 def addLandingConnection(analyzer, Entry):
@@ -215,11 +228,9 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
         gr.addEdge(analyzer['connectionsCapacity'], origin, destination, Capacity)
     return analyzer
 
-def addInternalConnections(analyzer):
+def addContinentConnection(analyzer):
     ltPorConectar = lt.newList('ARRAY_LIST',cmpfunction=compareroutes)
     ltVertices = gr.vertices(analyzer['connectionsDistance'])
-    #print(gr.vertices(analyzer['connectionsDistance']))
-    print(gr.degree(analyzer['connectionsDistance'],'Russia'))
     for element in lt.iterator(ltVertices):
         if gr.degree(analyzer['connectionsDistance'],element)==0:
             if not lt.isPresent(ltPorConectar,element):
@@ -289,6 +300,11 @@ def newCountryValues():
     Values['countriesInfo'] = lt.newList('ARRAY_LIST')
     return Values
 
+def newContinentValues():
+    Values = {"ContinentCountries": None}
+    Values['ContinentCountries'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
+    return Values
+
 def formatVertexOring(Entry):
     """Formato del vértice del grafo"""
     name = Entry['origin'] + '*'
@@ -300,14 +316,6 @@ def formatVertexDestination(Entry):
     name = Entry['destination'] + '*'
     name = name + Entry['cable_name']
     return name
-
-def formatVertexCapital(analyzer,Entry):
-    LPorigen = Entry['origin']
-    value = mp.get(analyzer['LandingPointI'],LPorigen)
-    value = lt.getElement(me.getValue(value)['lstData'],1)['name']
-    nameCountry = value.split(',')
-    nameCountry = nameCountry[len(nameCountry)-1].strip()
-    return nameCountry
 
 def ObtenerPais(analyzer,key):
     if not mp.contains(analyzer['countriesInfo'],key):
@@ -342,29 +350,8 @@ def CalculateDistance(analyzer,oring,destination):
     distance *= 1000
     return distance
 
-def CalculateDistanceCapital(analyzer, oring, destination):
-    try:
-        Info1 = mp.get(analyzer['LandingPointI'],oring)
-        InfoCapital = mp.get(analyzer['LandingPointI'],destination)
-        latitude1 = me.getValue(Info1)['lstData']
-        latitude1 = float(lt.getElement(latitude1,1)['latitude'])
-        latitudeCapital = me.getValue(InfoCapital)['lstData']
-        latitudeCapital = float(lt.getElement(latitudeCapital,1)['CapitalLatitude'])
-        longitude1 = me.getValue(Info1)['lstData']
-        longitude1 = float(lt.getElement(longitude1,1)['longitude'])
-        longitudeCapital = me.getValue(InfoCapital)['lstData']
-        longitudeCapital = float(lt.getElement(longitudeCapital,1)['CapitalLongitude'])
-        loc1=latitude1,longitude1
-        loc2=latitudeCapital,longitudeCapital
-        distance = hs.haversine(loc1,loc2)
-        distance *= 1000
-        return distance
-    except:
-        pass
-
 def NumSCC(catalog):
     return scc.connectedComponents(catalog['components'])
-
 
 #Funciones Comparacion
 

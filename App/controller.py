@@ -58,7 +58,7 @@ def loadData(analyzer):
     for Entry in input_file:
         model.addLandingConnection(analyzer, Entry)
     model.addLandingCapitalConnections(analyzer)
-    #model.addInternalConnections(analyzer)
+    model.addContinentConnection(analyzer)
     InfoPrimerLanding="Identificador: "+InfoPrimero['landing_point_id']+". Nombre: "+InfoPrimero['name']+". Latitud: "+InfoPrimero['latitude']+". Longitud: "+InfoPrimero['longitude']
     InfoUltimoPais="Pais: "+InfoUltimo['CountryName']+". Población: "+InfoUltimo['Population']+". Usuarios Internet: "+InfoUltimo['Internet users']
     return analyzer,InfoPrimerLanding,InfoUltimoPais
