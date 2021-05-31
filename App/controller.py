@@ -80,6 +80,9 @@ def caminosMinimos(catalog,Fuente):
 def caminoMin(caminosMinimos,Pais2):
     return model.caminoMin(caminosMinimos,Pais2)
 
+def CrearMst(catalog):
+    return model.CrearMst(catalog)
+
 # Funciones de consulta sobre el catálogo
 
 def InfoCatalog(analyzer):
@@ -87,3 +90,6 @@ def InfoCatalog(analyzer):
 
 def NumSCC(catalog):
     return model.NumSCC(catalog)
+
+def InfoMst(mst,catalog):
+    return model.InfoMst(mst,catalog)

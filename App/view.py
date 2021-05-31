@@ -107,6 +107,16 @@ def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
 
+def printReq4(mst,NumNodos,dist,Rama,time_mseg):
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    print("El número de nodos conectados a la red de expansión mínima es: " + str(NumNodos))
+    print("El costo total de la red de expansión mínima es: " + str(dist/1000) + " Km.")
+    print("Rama más larga: ")
+    print(Rama)
+    print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    input("Enter para continuar")
+
 catalog = None
 
 """
@@ -158,20 +168,26 @@ while True:
     #Req 3
     elif int(inputs[0]) == 5:
         t1 = time.process_time()
-        Pais1 = input("Ingrese el nombre del primer País: ")
-        Pais2 = input("Ingrese el nombre del segundo País: ")
-        caminosMinimos = controller.caminosMinimos(catalog,Pais1)
-        camino, distancia = controller.caminoMin(caminosMinimos,Pais2)
+        pais1 = input("Ingrese el nombre del primer País: ")
+        pais2 = input("Ingrese el nombre del segundo País: ")
+        caminosMinimos = controller.caminosMinimos(catalog,pais1)
+        camino, distancia = controller.caminoMin(caminosMinimos,pais2)
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
-        printReq3(Pais1,Pais2,camino,distancia,time_mseg)
+        printReq3(pais1,pais2,camino,distancia,time_mseg)
 
     #Req 4
     elif int(inputs[0]) == 6:
-        pass
+        t1 = time.process_time()
+        mst = controller.CrearMst(catalog)
+        dist, NumNodos, Rama = controller.InfoMst(mst,catalog)
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        printReq4(mst,NumNodos,dist,Rama,time_mseg)
 
     #Req 5
     elif int(inputs[0]) == 7:
+        nombreLanding = input("Ingrese el nombre del Landing Point: ")
         pass
 
     elif int(inputs[0]) == 8:

@@ -25,6 +25,7 @@
  """
 
 
+from DISClib.Algorithms.Graphs.prim import PrimMST as prim
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -33,6 +34,9 @@ from DISClib.Algorithms.Sorting import shellsort as sa
 from DISClib.ADT.graph import gr
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.Algorithms.Graphs import prim
+from DISClib.Algorithms.Graphs import dfs
+from DISClib.DataStructures import edge as e
 from DISClib.Utils import error as error
 import math
 from DISClib.Algorithms.Sorting import mergesort as Merge
@@ -258,6 +262,10 @@ def caminoMin(caminosMinimos,Pais2):
         distancia = -1
     return camino, distancia
 
+def CrearMst(catalog):
+    mst = prim.PrimMST(catalog['connectionsDistance'])
+    return mst
+
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
@@ -354,6 +362,17 @@ def CalculateDistanceCapital(analyzer, oring, destination):
 def NumSCC(catalog):
     return scc.connectedComponents(catalog['components'])
 
+def InfoMst(mst,catalog):
+    dist = prim.weightMST(catalog['connectionsDistance'],mst)
+    NumNodos = gr.numVertices(catalog['connectionsDistance'])
+    """mst2 = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
+    lista = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+    arcos = mst['mst']
+    for arco in lt.iterator(arcos):
+        gr.addEdge(mst2,e.either(arco),e.weight(arco))
+    dfs.DepthFirstSearch(mst2,)"""
+    Rama = ""
+    return dist, NumNodos, Rama
 
 #Funciones Comparacion
 
