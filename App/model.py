@@ -53,9 +53,9 @@ def newAnalyzer():
 
         analyzer['LandingPointN'] = mp.newMap(numelements=1290,maptype='PROBING',comparefunction=compareCountryNames)
 
-        analyzer['connectionsDistance'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
+        analyzer['connectionsDistance'] = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
 
-        analyzer['connectionsCapacity'] = gr.newGraph(datastructure='ADJ_LIST',directed=False,size=3500,comparefunction=compareLanCableIds)
+        analyzer['connectionsCapacity'] = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
 
         analyzer['countriesInfo'] = mp.newMap(numelements=240, maptype='PROBING', comparefunction=compareCountryNames)
 
@@ -65,17 +65,33 @@ def newAnalyzer():
 
 # Funciones para agregar informacion al catalogo
 
-def AddLandingPointsData(analyzer, Entry):
-    entry = mp.get(analyzer['LandingPointI'], Entry['landing_point_id'])
-    if entry is None:
-        CaracEntry = CreateLandingInfo()
+def AddLandingPointsData(Analyzer, Entry):
+    ID=Entry['landing_point_id']
+    paisLanding = Entry['name']
+    paisLanding = paisLanding.split(',')
+    paisLanding = paisLanding[len(paisLanding)-1].strip()
+    existLanding = mp.contains(Analyzer['LandingPointI'], ID)
+    if existLanding:
+        infoEntry = mp.get(Analyzer['LandingPointI'], ID)
+        LandingInfo = me.getValue(infoEntry)
     else:
-        CaracEntry = me.getValue(entry)
-    lt.addLast(CaracEntry['lstData'], Entry)
-    mp.put(analyzer['LandingPointI'],Entry['landing_point_id'],CaracEntry)
-    mp.put(analyzer['LandingPointN'],Entry['name'],CaracEntry)
-#    ObtenerPais(analyzer)
-    return analyzer
+        LandingInfo = CreateLandingInfo()
+    lt.addLast(LandingInfo['lstData'], Entry)
+    lt.addLast(LandingInfo['lstLocation'], Entry['latitude'])
+    lt.addLast(LandingInfo['lstLocation'], Entry['longitude'])
+    mp.put(Analyzer['LandingPointI'],ID,LandingInfo)
+    mp.put(Analyzer['LandingPointN'],Entry['name'],ID)
+    addLandingVertexDistance(Analyzer, ID)
+    addLandingVertexCapacity(Analyzer, ID)
+    """Cosultamos la información del landing point del pais para agregarle la información 
+    al respecto de un landing point existente dentro del país."""
+    PaisEntry = mp.get(Analyzer['LandingPointI'], paisLanding)
+    LandingPais = me.getValue(PaisEntry)
+    lstLandingPais = LandingPais['lstLandings']
+    if not lt.isPresent(lstLandingPais,ID):
+        lt.addLast(lstLandingPais,ID)
+    mp.put(Analyzer['LandingPointI'], paisLanding ,LandingPais)
+    return Analyzer
 
 def AddCountry(Analyzer,country):
     """Agregamos el país a una tabla de hash con Llave igual al nombre del país,

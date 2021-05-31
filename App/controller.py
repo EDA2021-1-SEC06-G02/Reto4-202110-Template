@@ -57,7 +57,7 @@ def loadData(analyzer):
     input_file = csv.DictReader(open(File, encoding="utf-8-sig"), delimiter=",")
     for Entry in input_file:
         model.addLandingConnection(analyzer, Entry)
-    model.addRouteConnections(analyzer)
+    #model.addRouteConnections(analyzer)
     #model.addInternalConnections(analyzer)
     InfoPrimerLanding="Identificador: "+InfoPrimero['landing_point_id']+". Nombre: "+InfoPrimero['name']+". Latitud: "+InfoPrimero['latitude']+". Longitud: "+InfoPrimero['longitude']
     InfoUltimoPais="Pais: "+InfoUltimo['CountryName']+". Población: "+InfoUltimo['Population']+". Usuarios Internet: "+InfoUltimo['Internet users']
