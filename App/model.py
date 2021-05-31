@@ -300,14 +300,15 @@ def landingMoreCables(catalog):
     maxCables = 0
     landings = mp.keySet(catalog["LandingPointI"])
     for landing in lt.iterator(landings):
-        datosLanding = lt.getElement(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstData'],1)
-        cables = lt.size(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstCables'])
-        if cables > maxCables:
-            maxCables = cables
-            landingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
-            lt.addLast(landingMoreCables,datosLanding)
-        elif(cables == maxCables):
-            lt.addLast(landingMoreCables,datosLanding)
+        if not mp.contains(catalog['countriesInfo'],landing):
+            datosLanding = lt.getElement(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstData'],1)
+            cables = lt.size(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstCables'])
+            if cables > maxCables:
+                maxCables = cables
+                landingMoreCables = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+                lt.addLast(landingMoreCables,datosLanding)
+            elif(cables == maxCables):
+                lt.addLast(landingMoreCables,datosLanding)
     return landingMoreCables, maxCables
 
 def caminosMinimos(catalog,Fuente):
