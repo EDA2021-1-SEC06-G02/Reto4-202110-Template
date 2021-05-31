@@ -198,13 +198,17 @@ def addLandingCapitalConnections(analyzer):
     lstCountries = mp.keySet(analyzer['countriesInfo'])
     for CountryName in lt.iterator(lstCountries):
         CountryLandingInfo = mp.get(analyzer['LandingPointI'], CountryName)
-        lstLandingsCountries= me.getValue(CountryLandingInfo)['lstLandings']
+        CountryLandingInfo = me.getValue(CountryLandingInfo)
+        lstLandingsCountries = CountryLandingInfo['lstLandings']
         for LandingID in lt.iterator(lstLandingsCountries):
             CapitalLandingDistance = CalculateDistance(analyzer,CountryName,LandingID)
             LandingInfo = mp.get(analyzer['LandingPointI'], LandingID)
-            lstCablesLanding = me.getValue(LandingInfo)['lstCables']
+            LandingInfo = me.getValue(LandingInfo)
+            lstCablesLanding = LandingInfo['lstCables']
             lstCablesLandingOrdenada = CapacityOrder(lstCablesLanding)
             capacity = lt.getElement(lstCablesLandingOrdenada,1)[1]
+            CountryLandingInfo['MinCapacity_Landing'] = capacity
+            LandingInfo['MinCapacity_Landing'] = capacity
             addConnectionDistance(analyzer, CountryName, LandingID, CapitalLandingDistance)
             addConnectionDistance(analyzer, LandingID, CountryName, CapitalLandingDistance)
             addConnectionCapacity(analyzer, CountryName, LandingID, capacity)
@@ -229,13 +233,42 @@ def addConnectionCapacity(analyzer, origin, destination, Capacity):
     return analyzer
 
 def addContinentConnection(analyzer):
-    ltPorConectar = lt.newList('ARRAY_LIST',cmpfunction=compareroutes)
     ltVertices = gr.vertices(analyzer['connectionsDistance'])
     for element in lt.iterator(ltVertices):
-        if gr.degree(analyzer['connectionsDistance'],element)==0:
-            if not lt.isPresent(ltPorConectar,element):
-                lt.addLast(ltPorConectar,element)
-    print(ltPorConectar)
+        if element == 'Palestine':
+            minElementInfo = mp.get(analyzer['LandingPointI'],'Israel')
+            capacity = me.getValue(minElementInfo)['MinCapacity_Landing']
+            addConnectionDistance(analyzer, 'Palestine', 'Israel', 100)
+            addConnectionDistance(analyzer, 'Israel', 'Palestine', 100)
+            addConnectionCapacity(analyzer, 'Palestine', 'Israel', capacity)
+            addConnectionCapacity(analyzer, 'Israel', 'Palestine', capacity)
+        elif gr.degree(analyzer['connectionsDistance'],element)==0:
+            primero = True
+            minElement = ""
+            minDistance = 0
+            capacity = 0
+            lstLandingPoints = mp.keySet(analyzer['LandingPointI'])
+            for key in lt.iterator(lstLandingPoints):
+                if not (key == element):
+                    distance = CalculateDistance(analyzer,element,key)
+                    if primero:
+                        minDistance = distance
+                        minElement = key
+                        minElementInfo = mp.get(analyzer['LandingPointI'],key)
+                        minElementInfo = me.getValue(minElementInfo)
+                        capacity = minElementInfo['MinCapacity_Landing']
+                        primero = False
+                    elif minDistance < distance:
+                        minDistance = distance
+                        minElement = key
+                        minElementInfo = mp.get(analyzer['LandingPointI'],key)
+                        minElementInfo = me.getValue(minElementInfo)
+                        capacity = minElementInfo['MinCapacity_Landing']
+            addConnectionDistance(analyzer, element, minElement, minDistance)
+            addConnectionDistance(analyzer, minElement, element, minDistance)
+            addConnectionCapacity(analyzer, element, minElement, capacity)
+            addConnectionCapacity(analyzer, minElement, element, capacity)
+    ltVertices = gr.vertices(analyzer['connectionsDistance'])
     return analyzer
 
 #IDK
@@ -283,16 +316,18 @@ def LandingMoreCables(catalog):
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
-    entry = {'lstData':None,'lstCables':None,'lstLocation':None}
+    entry = {'lstData':None,'lstCables':None,'lstLocation':None,'MinCapacity_Landing':float}
     entry['lstData'] = lt.newList('ARRAY_LIST')
     entry['lstCables'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
     entry['lstLocation'] = lt.newList('ARRAY_LIST')
+    entry['MinCapacity_Landing'] = 0
     return entry
 
 def CreateLandingCountriesInfo():
-    entry = {'lstLandings':None,'lstLocation':None}
+    entry = {'lstLandings':None,'lstLocation':None,'MinCapacity_Landing':float}
     entry['lstLandings'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
     entry['lstLocation'] = lt.newList('ARRAY_LIST')
+    entry['MinCapacity_Landing'] = 0
     return entry
 
 def newCountryValues():
@@ -316,15 +351,6 @@ def formatVertexDestination(Entry):
     name = Entry['destination'] + '*'
     name = name + Entry['cable_name']
     return name
-
-def ObtenerPais(analyzer,key):
-    if not mp.contains(analyzer['countriesInfo'],key):
-        value = mp.get(analyzer['LandingPointI'],key)
-        value = lt.getElement(me.getValue(value)['lstData'],1)['name']
-        nameCountry = value.split(',')
-        nameCountry = nameCountry[len(nameCountry)-1].strip()
-        #print(nameCountry)
-        return nameCountry
 
 # Funciones de consulta
 
@@ -397,11 +423,3 @@ def CapacityOrder(listaOrdenada):
 
 def cmpCapacitys(capacitys1, capacitys2):
     return capacitys1[1] < capacitys2[1]
-
-"""
-for key in lt.iterator(mp.keySet(analyzer['LandingPointI'])):
-        if mp.contains(analyzer['countriesInfo'],key):
-            value = mp.get(analyzer['LandingPointI'],key)
-            value = me.getValue(value)['lstLandings']
-            if lt.size(value)==0:
-                print(key)"""
