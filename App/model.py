@@ -278,9 +278,8 @@ def mismoCluster(catalog, landing1, landing2):
     if landing1 != None and landing2 != None:
         landing1 = me.getValue(landing1)
         landing2 = me.getValue(landing2)
-        landing1_id = lt.getElement(landing1['lstData'],1)["landing_point_id"]
-        landing2_id = lt.getElement(landing2['lstData'],1)["landing_point_id"]
-        i = 1
+        encontrado = scc.stronglyConnected(catalog['components'], landing1, landing2)
+        """i = 1
         encontrado = False
         while i <= lt.size(landing1['lstCables']) and not(encontrado):
             vertice1 = str(landing1_id) + "-" + lt.getElement(landing1['lstCables'],i)[0]
@@ -289,7 +288,7 @@ def mismoCluster(catalog, landing1, landing2):
                 vertice2 = str(landing2_id) + "-" + lt.getElement(landing2['lstCables'],j)[0]
                 encontrado = scc.stronglyConnected(catalog['components'], vertice1, vertice2)
                 j+=1
-            i+=1
+            i+=1"""
     return encontrado
 
 def landingMoreCables(catalog):
