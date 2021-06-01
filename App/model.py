@@ -26,6 +26,7 @@
 
 
 from DISClib.Algorithms.Graphs.prim import PrimMST as prim
+import random as ran
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -408,19 +409,62 @@ def NumSCC(catalog):
 
 def InfoMst(mst,catalog):
     dist = prim.weightMST(catalog['connectionsDistance'],mst)
-    NumNodos = gr.numVertices(catalog['connectionsDistance'])
-    """mst2 = gr.newGraph(datastructure='ADJ_LIST',directed=True,size=3500,comparefunction=compareLanCableIds)
-    lista = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
-    arcos = mst['mst']
-    for arco in lt.iterator(arcos):
-        gr.addEdge(mst2,e.either(arco),e.weight(arco))
-    dfs.DepthFirstSearch(mst2,)"""
-    Rama = ""
+    NumNodos = lt.size(mp.keySet(mst['edgeTo']))
+    #NumNodos = gr.numVertices(catalog['connectionsDistance'])
+    TablaVisitados = mp.newMap(numelements=NumNodos,maptype='PROBING',comparefunction=compareLanCableIds)
+    lstNodosMST = mp.keySet(mst['edgeTo'])
+    ContadorGlobal = 0
+    while (ContadorGlobal<lt.size(lstNodosMST)):
+        centinelaCorto = True
+        while centinelaCorto:
+            num = ran.randint(1, lt.size(lstNodosMST))
+            Origen = lt.getElement(lstNodosMST,num)
+            if not(mp.contains(TablaVisitados, Origen)) and not(ContadorGlobal==lt.size(lstNodosMST)):
+                centinelaCorto = False
+        contadorCamino = 1
+        VertexToCompare = Origen
+        verifica = True
+        camino = ""
+        while verifica:
+            VertexTrue = mp.contains(TablaVisitados, VertexToCompare)
+            if VertexTrue:
+                InfoVerticeVisitado = mp.get(TablaVisitados,VertexToCompare)
+                InfoVerticeVisitado = me.getValue(InfoVerticeVisitado)
+                #print(InfoVerticeVisitado['Contador'])
+                ContadorGlobal += InfoVerticeVisitado['Contador']
+                verifica = False
+            else:
+                InfoVertex = createInfoTablaReq4()
+                mp.put(TablaVisitados,VertexToCompare,InfoVertex)
+                conexiones = mp.get(mst['edgeTo'],VertexToCompare)
+                if not(conexiones == None):
+                    conexiones = me.getValue(conexiones)
+                    if VertexToCompare == e.either(conexiones):
+                        # agregar VertexToCompare a la secuancia de datos para utilizar.
+                        VertexToCompare = e.other(conexiones,VertexToCompare)
+                    else:
+                        VertexToCompare = e.either(conexiones)
+                    contadorCamino += 1
+                    ContadorGlobal +=1
+                else:
+                    verifica = False
+                    InfoVerticeVisitado = mp.get(TablaVisitados,Origen)
+                    InfoVerticeVisitado = me.getValue(InfoVerticeVisitado)
+                    print(contadorCamino)
+                    InfoVerticeVisitado['Contador'] = contadorCamino
+                    mp.put(TablaVisitados,Origen,InfoVerticeVisitado)
+    Rama = ContadorGlobal
     return dist, NumNodos, Rama
 
 def verificarPais(catalog,pais2):
     verificado = mp.contains(catalog['countriesInfo'],pais2)
     return verificado
+
+def createInfoTablaReq4():
+    entry= {'Contador':int,'Camino':None}
+    entry['Contador'] = 0
+    entry['Camino'] = ""
+    return entry
 
 #Funciones Comparacion
 
