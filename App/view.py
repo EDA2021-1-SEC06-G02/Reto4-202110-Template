@@ -136,6 +136,22 @@ def printReq4(mst,NumNodos,dist,Rama,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
 
+def printReq5(listaPaises,time_mseg):
+    formato1 = "El numero de paises afectados es {} y estos son:"
+    formato2 = "({}){} que se encuentra a una distancia de {} km"
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    if (listaPaises != "NE"):
+        print(formato1.format(lt.size(listaPaises)))
+        i = 1
+        for elemento in lt.iterator(listaPaises):
+            print(formato2.format(i,elemento[0],elemento[1]))
+            i += 1
+    else:
+        print("No existe un Landing Point con el nombre ingresado.")
+    print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
+    input("Enter para continuar")
+
 catalog = None
 
 """
@@ -211,8 +227,12 @@ while True:
 
     #Req 5
     elif int(inputs[0]) == 7:
+        t1 = time.process_time()
         nombreLanding = input("Ingrese el nombre del Landing Point: ")
-        pass
+        listaPaises = controller.PaisesAfectados(catalog,nombreLanding)
+        t2 = time.process_time()
+        time_mseg = (t2 - t1)*1000
+        printReq5(listaPaises,time_mseg)
 
     elif int(inputs[0]) == 8:
         pass

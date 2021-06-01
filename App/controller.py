@@ -83,6 +83,9 @@ def caminoMin(caminosMinimos,pais1,pais2):
 def CrearMst(catalog):
     return model.CrearMst(catalog)
 
+def PaisesAfectados(catalog,nombreLanding):
+    return model.PaisesAfectados(catalog,nombreLanding)
+
 # Funciones de consulta sobre el catálogo
 
 def InfoCatalog(analyzer):

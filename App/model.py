@@ -25,14 +25,16 @@
  """
 
 
+from abc import abstractproperty
 from DISClib.Algorithms.Graphs.prim import PrimMST as prim
 import random as ran
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
+from DISClib.ADT import minpq as pq
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
-from DISClib.ADT.graph import gr
+from DISClib.ADT.graph import adjacents, gr
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Algorithms.Graphs import prim
@@ -40,7 +42,7 @@ from DISClib.Algorithms.Graphs import dfs
 from DISClib.DataStructures import edge as e
 from DISClib.Utils import error as error
 import math
-from DISClib.Algorithms.Sorting import mergesort as Merge
+from DISClib.Algorithms.Sorting import mergesort as merge
 import haversine as hs
 assert cf
 
@@ -341,6 +343,52 @@ def CrearMst(catalog):
     mst = prim.PrimMST(catalog['connectionsDistance'])
     return mst
 
+def PaisesAfectados(catalog,nombreLanding):
+    landing = mp.get(catalog["LandingPointN"],nombreLanding)
+    listaPaises = "NE"
+    if landing != None:
+        #listaPaises = lt.newList('ARRAY_LIST')
+        tablitaPaises = mp.newMap(numelements=10,maptype='PROBING',comparefunction=compareCountryNames)
+        landing = me.getValue(landing)
+        datosLanding = lt.getElement(me.getValue(mp.get(catalog["LandingPointI"],landing))['lstData'],1)
+        paisLanding = datosLanding["name"].split(",")
+        paisLanding = paisLanding[len(paisLanding)-1].strip()
+        h = paisLanding
+        edge = gr.getEdge(catalog["connectionsDistance"],paisLanding,landing)
+        peso = e.weight(edge)/1000
+        #lt.addLast(listaPaises,paisLanding)
+        mp.put(tablitaPaises,paisLanding,peso)
+        adyacentes = gr.adjacentEdges(catalog["connectionsDistance"],landing)
+        for arco in lt.iterator(adyacentes):
+            OtroVertex = e.other(arco,landing)
+            if not mp.contains(catalog['countriesInfo'],OtroVertex):
+                adyacentes2 = gr.adjacentEdges(catalog["connectionsDistance"],OtroVertex)
+                for arco2 in lt.iterator(adyacentes2):
+                    OtroVertex2 = e.other(arco2,OtroVertex)
+                    if not mp.contains(catalog['countriesInfo'],OtroVertex2) and OtroVertex2 != landing:
+                        peso = e.weight(arco2)/1000
+                        id = OtroVertex2.split("*")[0]
+                        datosLanding = lt.getElement(me.getValue(mp.get(catalog["LandingPointI"],id))['lstData'],1)
+                        paisLanding = datosLanding["name"].split(",")
+                        paisLanding = paisLanding[len(paisLanding)-1].strip()
+                        #if lt.isPresent(listaPaises,paisLanding)==0:
+                        #    lt.addLast(listaPaises,paisLanding)
+                        pais = mp.get(tablitaPaises,paisLanding)
+                        if pais != None:
+                            pais = me.getValue(pais)
+                            if (peso<pais):
+                                mp.put(tablitaPaises,paisLanding,peso)  #ACA
+                        else:
+                            mp.put(tablitaPaises,paisLanding,peso)      #ACA
+        #heap = pq.newMinPQ(cmpfunction=compareDistance)
+        listaPaises = lt.newList('ARRAY_LIST')
+        for pais in lt.iterator(mp.keySet(tablitaPaises)):
+            elemento = me.getValue(mp.get(tablitaPaises,pais))
+            #pq.insert(heap,(pais,elemento))
+            lt.addLast(listaPaises,(pais,elemento))
+        merge.sort(listaPaises,compareDistance)
+    return listaPaises
+
 # Funciones para creacion de datos
 
 def CreateLandingInfo():
@@ -502,10 +550,13 @@ def compareCableName(Cable1, Cable2):
     else:
         return -1
 
+def compareDistance(distancia1, distancia2):
+    return distancia1[1] > distancia2[1]
+
 def CapacityOrder(listaOrdenada):
     sub_list = lt.subList(listaOrdenada, 1, lt.size(listaOrdenada))
     sub_list = sub_list.copy()
-    sorted_list = Merge.sort(sub_list, cmpCapacitys)
+    sorted_list = merge.sort(sub_list, cmpCapacitys)
     return sorted_list
 
 def cmpCapacitys(capacitys1, capacitys2):
