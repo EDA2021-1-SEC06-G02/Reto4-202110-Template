@@ -315,15 +315,26 @@ def caminosMinimos(catalog,Fuente):
     caminoMin = djk.Dijkstra(catalog["connectionsDistance"],Fuente)
     return caminoMin
 
-def caminoMin(caminosMinimos,Pais2):
+def caminoMin(caminosMinimos,pais1,pais2):
     """ Se consigue la distancia y el camino que conecta la fuente del grafo Caminos minimos con el Pais2.
     Si la distancia es infinito, lo cual indica que no hay camino, esta se remplaza por -1.
     #PROXIMAMENTE: Pasar el camino a una lista para que sea facil de imprimir en el view"""
-    camino = djk.pathTo(caminosMinimos,Pais2)
-    distancia = djk.distTo(caminosMinimos,Pais2)
+    caminos = lt.newList('ARRAY_LIST',cmpfunction=compareCountryNames)
+    camino = djk.pathTo(caminosMinimos,pais2)
+    distancia = djk.distTo(caminosMinimos,pais2)
     if distancia == math.inf:
         distancia = -1
-    return camino, distancia
+    else:
+        for elemento in lt.iterator(camino):
+            dato = lt.newList('ARRAY_LIST')
+            land1 = e.either(elemento)
+            peso = e.weight(elemento)
+            land2 = e.other(elemento,e.either(elemento))
+            lt.addLast(dato,land1)
+            lt.addLast(dato,peso)
+            lt.addLast(dato,land2)
+            lt.addLast(caminos,dato)
+    return caminos, distancia
 
 def CrearMst(catalog):
     mst = prim.PrimMST(catalog['connectionsDistance'])
@@ -406,6 +417,10 @@ def InfoMst(mst,catalog):
     dfs.DepthFirstSearch(mst2,)"""
     Rama = ""
     return dist, NumNodos, Rama
+
+def verificarPais(catalog,pais2):
+    verificado = mp.contains(catalog['countriesInfo'],pais2)
+    return verificado
 
 #Funciones Comparacion
 

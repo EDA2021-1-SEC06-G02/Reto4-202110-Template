@@ -93,16 +93,35 @@ def printReq2(numero,LandingMoreCables,time_mseg):
     input("Enter para continuar")
 
 def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
-    formato1 = "La distancia total desde {} hasta {} es de {} metros."
-    formato2 = "-> Nombre: {}, identificador: {}, país: {}"
-    formato3 = "No existe un camino entre {} y {}."
+    formato1 = "No existe un camino entre {} y {}."
+    formato2 = "La distancia total desde {} hasta {} es de {} km."
+    formato3 = "({} ){}----- {} ----->{}"
+    formato4 = "({}){}----- {} ----->{}"
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     if (distancia) == -1:
-        print(formato3.format(Pais1,Pais2))
+        print(formato1.format(Pais1,Pais2))
     else:
-        print(formato1.format(Pais1,Pais2,distancia))
-        print("El camino a realizar es:")
-        print(camino)
+        print(formato2.format(Pais1,Pais2,distancia/1000))
+        print("El camino a realizar es: ")
+        print(" "*14 + "**Landing Inicio**" + " "*26 + "**Distancia[Km]**" + " "*23 + "**Landing Llegada**")
+        i = 1
+        for elemento in lt.iterator(camino):
+            landing1 =lt.getElement(elemento,1)
+            peso = lt.getElement(elemento,2)/1000
+            landing2 =lt.getElement(elemento,3)
+            if len(landing1) < 45:
+                landing1 = str(landing1) + " "*(45-len(landing1))
+            if len(str(peso)) < 40:
+                if (len(str(peso))%2 ==0):
+                    peso = " "*((25-len(str(peso)))//2) + str(peso) + " "*((20-len(str(peso)))//2)
+                else:
+                    peso = " "*((25-len(str(peso)))//2) + str(peso) + " "*((20-len(str(peso)))//2)
+            landing2 = " "*(10) + str(landing2) 
+            if i<10:
+                print(formato3.format(i,landing1,peso,landing2))
+            else:
+                print(formato4.format(i,landing1,peso,landing2))
+            i += 1
     print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
@@ -170,11 +189,16 @@ while True:
         t1 = time.process_time()
         pais1 = input("Ingrese el nombre del primer País: ")
         pais2 = input("Ingrese el nombre del segundo País: ")
-        caminosMinimos = controller.caminosMinimos(catalog,pais1)
-        camino, distancia = controller.caminoMin(caminosMinimos,pais2)
-        t2 = time.process_time()
-        time_mseg = (t2 - t1)*1000
-        printReq3(pais1,pais2,camino,distancia,time_mseg)
+        verificado1 = controller.verificarPais(catalog,pais1)
+        verificado2 = controller.verificarPais(catalog,pais2)
+        if verificado1 and verificado2:
+            caminosMinimos = controller.caminosMinimos(catalog,pais1)
+            camino, distancia = controller.caminoMin(caminosMinimos,pais1,pais2)
+            t2 = time.process_time()
+            time_mseg = (t2 - t1)*1000
+            printReq3(pais1,pais2,camino,distancia,time_mseg)
+        else:
+            print("Alguno de los paises ingresados no existe.")
 
     #Req 4
     elif int(inputs[0]) == 6:

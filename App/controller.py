@@ -77,8 +77,8 @@ def landingMoreCables(catalog):
 def caminosMinimos(catalog,Fuente):
     return model.caminosMinimos(catalog,Fuente)
 
-def caminoMin(caminosMinimos,Pais2):
-    return model.caminoMin(caminosMinimos,Pais2)
+def caminoMin(caminosMinimos,pais1,pais2):
+    return model.caminoMin(caminosMinimos,pais1,pais2)
 
 def CrearMst(catalog):
     return model.CrearMst(catalog)
@@ -93,3 +93,6 @@ def NumSCC(catalog):
 
 def InfoMst(mst,catalog):
     return model.InfoMst(mst,catalog)
+
+def verificarPais(catalog,pais2):
+    return model.verificarPais(catalog,pais2)
