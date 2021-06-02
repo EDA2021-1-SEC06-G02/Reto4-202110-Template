@@ -456,62 +456,124 @@ def NumSCC(catalog):
     return scc.connectedComponents(catalog['components'])
 
 def InfoMst(mst,catalog):
+    maximo = 0
+    NodoMax = ""
     dist = prim.weightMST(catalog['connectionsDistance'],mst)
     NumNodos = lt.size(mp.keySet(mst['edgeTo']))
-    #NumNodos = gr.numVertices(catalog['connectionsDistance'])
     TablaVisitados = mp.newMap(numelements=NumNodos,maptype='PROBING',comparefunction=compareLanCableIds)
     lstNodosMST = mp.keySet(mst['edgeTo'])
-    ContadorGlobal = 0
-    while (ContadorGlobal<lt.size(lstNodosMST)):
+    TamañosFinales = True
+    while TamañosFinales:
+        if (lt.size(mp.keySet(mst['edgeTo']))<=lt.size(mp.keySet(TablaVisitados))):
+            TamañosFinales = False
         centinelaCorto = True
         while centinelaCorto:
             num = ran.randint(1, lt.size(lstNodosMST))
             Origen = lt.getElement(lstNodosMST,num)
-            if not(mp.contains(TablaVisitados, Origen)) and not(ContadorGlobal==lt.size(lstNodosMST)):
+            if not(mp.contains(TablaVisitados, Origen)) or not(TamañosFinales):
                 centinelaCorto = False
-        contadorCamino = 1
+        InfoVertexOrigin = createInfoTablaReq4()
+        CaminOrigen = InfoVertexOrigin['Secuencia']
+        lt.addLast(CaminOrigen,Origen)
         VertexToCompare = Origen
         verifica = True
-        camino = ""
         while verifica:
             VertexTrue = mp.contains(TablaVisitados, VertexToCompare)
             if VertexTrue:
                 InfoVerticeVisitado = mp.get(TablaVisitados,VertexToCompare)
                 InfoVerticeVisitado = me.getValue(InfoVerticeVisitado)
-                #print(InfoVerticeVisitado['Contador'])
-                ContadorGlobal += InfoVerticeVisitado['Contador']
+                ProVerticeVisitado = InfoVerticeVisitado['ProgenitorCamino']
+                InfoVerticProge = mp.get(TablaVisitados,ProVerticeVisitado)
+                print(ProVerticeVisitado)
+                ListaVerticProge = me.getValue(InfoVerticProge)['Secuencia']
+                indexPasado = lt.isPresent(ListaVerticProge,VertexToCompare)
+                indexActual = lt.isPresent(CaminOrigen,VertexToCompare)
+                caminoNodoFin = lt.size(ListaVerticProge)-indexPasado
+                if InfoVerticeVisitado['TotNodosHastaFin'] == 0:
+                    InfoVerticeVisitado['TotNodosHastaFin'] = indexPasado
+                else:
+                    if indexActual > indexPasado:
+                        InfoVerticeVisitado['NodoMax'] = Origen
+                        InfoVerticeVisitado['TotNodosHastaFin'] = indexActual
+                CaminoFin = InfoVerticeVisitado['TotNodosHastaFin'] + caminoNodoFin
                 verifica = False
+                InfoVertexOrigin['ElementoFinal'] = VertexToCompare
+                mp.put(TablaVisitados,VertexToCompare,InfoVerticeVisitado)
             else:
-                InfoVertex = createInfoTablaReq4()
-                mp.put(TablaVisitados,VertexToCompare,InfoVertex)
+                InfoVertex = createNodoIntermedio()
                 conexiones = mp.get(mst['edgeTo'],VertexToCompare)
+                anterior = VertexToCompare
                 if not(conexiones == None):
                     conexiones = me.getValue(conexiones)
                     if VertexToCompare == e.either(conexiones):
-                        # agregar VertexToCompare a la secuancia de datos para utilizar.
                         VertexToCompare = e.other(conexiones,VertexToCompare)
                     else:
                         VertexToCompare = e.either(conexiones)
-                    contadorCamino += 1
-                    ContadorGlobal +=1
+                    lt.addLast(CaminOrigen,VertexToCompare)
                 else:
+                    InfoVertexOrigin['ElementoFinal'] = "None"
                     verifica = False
-                    InfoVerticeVisitado = mp.get(TablaVisitados,Origen)
-                    InfoVerticeVisitado = me.getValue(InfoVerticeVisitado)
-                    print(contadorCamino)
-                    InfoVerticeVisitado['Contador'] = contadorCamino
-                    mp.put(TablaVisitados,Origen,InfoVerticeVisitado)
-    Rama = ContadorGlobal
+                InfoVertex['ProgenitorCamino'] = Origen
+                print(InfoVertex['ProgenitorCamino'])
+                mp.put(TablaVisitados,anterior,InfoVertex)
+                CaminoFin = lt.size(CaminOrigen)
+        InfoVertexOrigin['ElementoFinal'] = Origen
+        if CaminoFin > maximo:
+            maximo = CaminoFin
+            NodoMax = Origen
+        mp.put(TablaVisitados,Origen,InfoVertexOrigin)
+    Rama = ""
+    print(NodoMax,maximo)
+    """datosMax = mp.get(TablaVisitados,NodoMax)
+    datosMax = me.getValue(datosMax)
+    secuencia = datosMax['secuencia']
+    control = True
+    Primerelemento = NodoMax
+    while control:
+        InfoPrimerElemento = mp.get(TablaVisitados,Primerelemento)
+        InfoPrimerElemento = me.getValue(InfoPrimerElemento)
+        ultimoElemento = datosMax['ElementoFinal']
+        if not(ultimoElemento == "None"):
+            Primerelemento = ultimoElemento
+            ultimoElemento = InfoPrimerElemento['ElementoFinal']
+        else:
+            control = False
+"""
     return dist, NumNodos, Rama
+
+    """InfoVerticeVisitadoI = mp.get(TablaVisitados,VertexToCompare)
+    InfoVerticeVisitadoI = me.getValue(InfoVerticeVisitadoI)
+    InfoVerticeVisitadoF = mp.get(TablaVisitados,VertexToCompare)
+    InfoVerticeVisitadoF = me.getValue(InfoVerticeVisitadoF)
+    print(Origen,"Size Camino:",lt.size(CaminOrigen),VertexToCompare)
+    print(CaminOrigen)
+    j = ran.randint(1, lt.size(CaminOrigen))
+    h = lt.getElement(CaminOrigen,j)
+    InfoVerticeVisitadoh = mp.get(TablaVisitados,h)
+    InfoVerticeVisitadoh = me.getValue(InfoVerticeVisitadoh)
+    print(InfoVerticeVisitadoh['Progenitor'])
+    print(lt.isPresent(CaminOrigen,h))
+    print(lt.isPresent(CaminOrigen,Origen))"""
 
 def verificarPais(catalog,pais2):
     verificado = mp.contains(catalog['countriesInfo'],pais2)
     return verificado
 
 def createInfoTablaReq4():
-    entry= {'Contador':int,'Camino':None}
-    entry['Contador'] = 0
-    entry['Camino'] = ""
+    entry= {'TotNodosHastaFin':int,'NodoMax':str,'ProgenitorCamino':str,'ElementoFinal':str,'Secuencia':None}
+    entry['TotNodosHastaFin'] = 0
+    entry['NodoMax'] = ""
+    entry['ProgenitorCamino'] = ""
+    entry['ElementoFinal'] = ""
+    entry['Secuencia'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
+    return entry
+
+def createNodoIntermedio():
+    entry= {'TotNodosHastaFin':int,'NodoMax':str,'ProgenitorCamino':str,'ElementoFinal':str}
+    entry['TotNodosHastaFin'] = 0
+    entry['NodoMax'] = ""
+    entry['ProgenitorCamino'] = ""
+    entry['ElementoFinal'] = ""
     return entry
 
 #Funciones Comparacion
