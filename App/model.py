@@ -458,51 +458,52 @@ def NumSCC(catalog):
 def InfoMst(mst,catalog):
     maximo = 0
     NodoMax = ""
+    actualElementoLista = 1
     dist = prim.weightMST(catalog['connectionsDistance'],mst)
     NumNodos = lt.size(mp.keySet(mst['edgeTo']))
     TablaVisitados = mp.newMap(numelements=NumNodos,maptype='PROBING',comparefunction=compareLanCableIds)
     lstNodosMST = mp.keySet(mst['edgeTo'])
     TamañosFinales = True
-    while TamañosFinales:
-        if (lt.size(mp.keySet(mst['edgeTo']))<=lt.size(mp.keySet(TablaVisitados))):
-            TamañosFinales = False
-        centinelaCorto = True
-        while centinelaCorto:
-            num = ran.randint(1, lt.size(lstNodosMST))
-            Origen = lt.getElement(lstNodosMST,num)
-            if not(mp.contains(TablaVisitados, Origen)) or not(TamañosFinales):
-                centinelaCorto = False
-        InfoVertexOrigin = createInfoTablaReq4()
-        CaminOrigen = InfoVertexOrigin['Secuencia']
-        lt.addLast(CaminOrigen,Origen)
-        VertexToCompare = Origen
-        verifica = True
-        while verifica:
-            VertexTrue = mp.contains(TablaVisitados, VertexToCompare)
-            if VertexTrue:
-                InfoVerticeVisitado = mp.get(TablaVisitados,VertexToCompare)
-                InfoVerticeVisitado = me.getValue(InfoVerticeVisitado)
-                ProVerticeVisitado = InfoVerticeVisitado['ProgenitorCamino']
-                InfoVerticProge = mp.get(TablaVisitados,ProVerticeVisitado)
-                print(ProVerticeVisitado)
-                ListaVerticProge = me.getValue(InfoVerticProge)['Secuencia']
-                indexPasado = lt.isPresent(ListaVerticProge,VertexToCompare)
-                indexActual = lt.isPresent(CaminOrigen,VertexToCompare)
-                caminoNodoFin = lt.size(ListaVerticProge)-indexPasado
-                if InfoVerticeVisitado['TotNodosHastaFin'] == 0:
-                    InfoVerticeVisitado['TotNodosHastaFin'] = indexPasado
+    """while TamañosFinales:
+        if (lt.size(lstNodosMST)) <= lt.size(mp.keySet(TablaVisitados)):
+            TamañosFinales = False"""
+    CaminoFin = 0
+    centinelaCorto = True
+    while centinelaCorto:
+        num = ran.randint(1, lt.size(lstNodosMST))
+        """i=actualElementoLista
+        while i <=lt.size(lstNodosMST):"""
+        Origen = lt.getElement(lstNodosMST,num)
+        if not(mp.contains(TablaVisitados, Origen)) or not TamañosFinales:
+            centinelaCorto = False
+                    #actualElementoLista = i
+                #i+=1
+    VertexToCompare = Origen
+    InfOrigen = CreateInfo_Req4()
+    InfOrigen['NodoGeneradorCamino'] = Origen
+    CaminOrigen = InfOrigen['Secuencia']
+    lt.addLast(CaminOrigen,Origen)
+    verifica = True
+    while verifica:
+        if VertexToCompare == Origen:
+            conexiones = mp.get(mst['edgeTo'],VertexToCompare)
+            if not(conexiones == None):
+                conexiones = me.getValue(conexiones)
+                if VertexToCompare == e.either(conexiones):
+                    VertexToCompare = e.other(conexiones,VertexToCompare)
                 else:
-                    if indexActual > indexPasado:
-                        InfoVerticeVisitado['NodoMax'] = Origen
-                        InfoVerticeVisitado['TotNodosHastaFin'] = indexActual
-                CaminoFin = InfoVerticeVisitado['TotNodosHastaFin'] + caminoNodoFin
-                verifica = False
-                InfoVertexOrigin['ElementoFinal'] = VertexToCompare
-                mp.put(TablaVisitados,VertexToCompare,InfoVerticeVisitado)
+                    VertexToCompare = e.either(conexiones)
+                lt.addLast(CaminOrigen,VertexToCompare)
             else:
-                InfoVertex = createNodoIntermedio()
-                conexiones = mp.get(mst['edgeTo'],VertexToCompare)
+                InfOrigen['ElementoFinal'] = "None"
+                verifica = False
+        else:
+            VertexTrue = mp.contains(TablaVisitados, VertexToCompare)
+            if not VertexTrue:
+                InfoVertex = CreateInfo_Req4()
+                InfoVertex['NodoGeneradorCamino'] = Origen
                 anterior = VertexToCompare
+                conexiones = mp.get(mst['edgeTo'],VertexToCompare)
                 if not(conexiones == None):
                     conexiones = me.getValue(conexiones)
                     if VertexToCompare == e.either(conexiones):
@@ -511,17 +512,39 @@ def InfoMst(mst,catalog):
                         VertexToCompare = e.either(conexiones)
                     lt.addLast(CaminOrigen,VertexToCompare)
                 else:
-                    InfoVertexOrigin['ElementoFinal'] = "None"
+                    InfOrigen['ElementoFinal'] = "None"
                     verifica = False
                 InfoVertex['ProgenitorCamino'] = Origen
-                print(InfoVertex['ProgenitorCamino'])
                 mp.put(TablaVisitados,anterior,InfoVertex)
                 CaminoFin = lt.size(CaminOrigen)
-        InfoVertexOrigin['ElementoFinal'] = Origen
-        if CaminoFin > maximo:
-            maximo = CaminoFin
-            NodoMax = Origen
-        mp.put(TablaVisitados,Origen,InfoVertexOrigin)
+            else:
+                infoVerticeYaVisitado = mp.get(TablaVisitados,VertexToCompare)
+                infoVerticeYaVisitado = me.getValue(infoVerticeYaVisitado)
+                if infoVerticeYaVisitado['NodoCaminoMax'] == "":
+                    NodoPadre = infoVerticeYaVisitado['NodoGeneradorCamino']
+                    infoVerticePadreRecorrido = mp.get(TablaVisitados,NodoPadre)
+                    infoVerticePadreRecorrido = me.getValue(infoVerticePadreRecorrido)
+                    infoVerticeYaVisitado['NodoCaminoMax'] = NodoPadre
+                    infoVerticeYaVisitado['ElementoFinal'] = infoVerticePadreRecorrido['ElementoFinal']
+                    listaPadre = infoVerticePadreRecorrido['Secuencia']
+                    DistanciaANodoPadre = lt.isPresent(listaPadre,VertexToCompare)
+                    infoVerticeYaVisitado['DistanciaANodoPadre'] = DistanciaANodoPadre
+                    DistanciaHastaElFin = lt.size(listaPadre) - DistanciaANodoPadre
+                    infoVerticeYaVisitado['NodosHastaFin'] = DistanciaHastaElFin
+                    mp.put(TablaVisitados,VertexToCompare,infoVerticeYaVisitado)
+                DistanciaInicialHastaElNodoPadre = infoVerticeYaVisitado['DistanciaANodoPadre']
+                DistanciaAlNodoActual = lt.isPresent(CaminOrigen,VertexToCompare)
+                if DistanciaAlNodoActual > DistanciaInicialHastaElNodoPadre:
+                    infoVerticeYaVisitado['DistanciaANodoPadre'] = DistanciaAlNodoActual
+                    infoVerticeYaVisitado['NodoCaminoMax'] = Origen
+                CaminoFin = lt.size(CaminOrigen) + infoVerticeYaVisitado['NodosHastaFin']
+                InfOrigen['ElementoFinal'] = VertexToCompare
+                verifica = False
+    InfOrigen['NodosHastaFin'] = CaminoFin
+    if InfOrigen['NodosHastaFin'] > maximo:
+        maximo = InfOrigen['NodosHastaFin']
+        NodoMax = Origen
+    mp.put(TablaVisitados,Origen,InfOrigen)
     Rama = ""
     print(NodoMax,maximo)
     """datosMax = mp.get(TablaVisitados,NodoMax)
@@ -541,39 +564,18 @@ def InfoMst(mst,catalog):
 """
     return dist, NumNodos, Rama
 
-    """InfoVerticeVisitadoI = mp.get(TablaVisitados,VertexToCompare)
-    InfoVerticeVisitadoI = me.getValue(InfoVerticeVisitadoI)
-    InfoVerticeVisitadoF = mp.get(TablaVisitados,VertexToCompare)
-    InfoVerticeVisitadoF = me.getValue(InfoVerticeVisitadoF)
-    print(Origen,"Size Camino:",lt.size(CaminOrigen),VertexToCompare)
-    print(CaminOrigen)
-    j = ran.randint(1, lt.size(CaminOrigen))
-    h = lt.getElement(CaminOrigen,j)
-    InfoVerticeVisitadoh = mp.get(TablaVisitados,h)
-    InfoVerticeVisitadoh = me.getValue(InfoVerticeVisitadoh)
-    print(InfoVerticeVisitadoh['Progenitor'])
-    print(lt.isPresent(CaminOrigen,h))
-    print(lt.isPresent(CaminOrigen,Origen))"""
-
 def verificarPais(catalog,pais2):
     verificado = mp.contains(catalog['countriesInfo'],pais2)
     return verificado
 
-def createInfoTablaReq4():
-    entry= {'TotNodosHastaFin':int,'NodoMax':str,'ProgenitorCamino':str,'ElementoFinal':str,'Secuencia':None}
-    entry['TotNodosHastaFin'] = 0
-    entry['NodoMax'] = ""
-    entry['ProgenitorCamino'] = ""
+def CreateInfo_Req4():
+    entry= {'NodosHastaFin':int,'NodoCaminoMax':str,'DistanciaANodoPadre':int,'NodoGeneradorCamino':str,'ElementoFinal':str,'Secuencia':None}
+    entry['NodosHastaFin'] = 0
+    entry['NodoCaminoMax'] = ""
+    entry['DistanciaANodoPadre'] = 0
+    entry['NodoGeneradorCamino'] = ""
     entry['ElementoFinal'] = ""
     entry['Secuencia'] = lt.newList('ARRAY_LIST',cmpfunction=compareCableName)
-    return entry
-
-def createNodoIntermedio():
-    entry= {'TotNodosHastaFin':int,'NodoMax':str,'ProgenitorCamino':str,'ElementoFinal':str}
-    entry['TotNodosHastaFin'] = 0
-    entry['NodoMax'] = ""
-    entry['ProgenitorCamino'] = ""
-    entry['ElementoFinal'] = ""
     return entry
 
 #Funciones Comparacion
