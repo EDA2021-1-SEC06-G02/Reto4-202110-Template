@@ -127,11 +127,19 @@ def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
     input("Enter para continuar")
 
 def printReq4(NumNodos,dist,Rama,time_mseg):
+    formato1 = "{} --> "
+    formato2 = "{}"
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     print("El número de nodos conectados a la red de expansión mínima es: " + str(NumNodos))
     print("El costo total de la red de expansión mínima es: " + str(dist/1000) + " Km.")
     print("Rama más larga: ")
-    print(Rama)
+    i = 1
+    FormatoFinal = ""
+    while i < lt.size(Rama):
+        FormatoFinal = FormatoFinal + formato1.format(lt.getElement(Rama,i))
+        i += 1
+    FormatoFinal = FormatoFinal + formato2.format(lt.getElement(Rama,lt.size(Rama)))
+    print(FormatoFinal)
     print ("Tiempo de ejecucion:",time_mseg,"milisegundos.")
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
