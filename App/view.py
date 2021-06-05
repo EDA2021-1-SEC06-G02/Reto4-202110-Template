@@ -126,7 +126,7 @@ def printReq3(Pais1,Pais2,camino,distancia,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     input("Enter para continuar")
 
-def printReq4(mst,NumNodos,dist,Rama,time_mseg):
+def printReq4(NumNodos,dist,Rama,time_mseg):
     print("-----------------------------------------------------------------------------------------------------------------------------------------------------")
     print("El número de nodos conectados a la red de expansión mínima es: " + str(NumNodos))
     print("El costo total de la red de expansión mínima es: " + str(dist/1000) + " Km.")
@@ -223,7 +223,7 @@ while True:
         dist, NumNodos, Rama = controller.InfoMst(mst,catalog)
         t2 = time.process_time()
         time_mseg = (t2 - t1)*1000
-        printReq4(mst,NumNodos,dist,Rama,time_mseg)
+        printReq4(NumNodos,dist,Rama,time_mseg)
 
     #Req 5
     elif int(inputs[0]) == 7:
